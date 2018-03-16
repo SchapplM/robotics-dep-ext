@@ -1,12 +1,16 @@
-%NUMROWS Return number of rows in matrix
+%NUMROWS Number of rows in matrix
 %
 % NR = NUMROWS(M) is the number of rows in the matrix M.
 %
-% See also NUMCOLS.
+% Notes::
+% - Readable shorthand for SIZE(M,1);
+%
+% See also NUMCOLS, SIZE.
 
 
 
-% Copyright (C) 1993-2014, by Peter I. Corke
+
+% Copyright (C) 1993-2017, by Peter I. Corke
 %
 % This file is part of The Robotics Toolbox for MATLAB (RTB).
 % 
@@ -27,4 +31,4 @@
 
 function r = numrows(m)
 
-	[r,x] = size(m);
+	r = size(m, 1);

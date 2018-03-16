@@ -1,11 +1,15 @@
-%NUMCOLS Return number of columns in matrix
+%NUMCOLS Number of columns in matrix
 %
 % NC = NUMCOLS(M) is the number of columns in the matrix M.
 %
-% See also NUMROWS.
+% Notes::
+% - Readable shorthand for SIZE(M,2);
+%
+% See also NUMROWS, SIZE.
 
 
-% Copyright (C) 1993-2014, by Peter I. Corke
+
+% Copyright (C) 1993-2017, by Peter I. Corke
 %
 % This file is part of The Robotics Toolbox for MATLAB (RTB).
 % 

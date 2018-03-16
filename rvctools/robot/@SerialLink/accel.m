@@ -1,26 +1,32 @@
 %SerialLink.accel Manipulator forward dynamics
 %
 % QDD = R.accel(Q, QD, TORQUE) is a vector (Nx1) of joint accelerations that result 
-% from applying the actuator force/torque to the manipulator robot in state Q and QD.
+% from applying the actuator force/torque (1xN) to the manipulator robot R in
+% state Q (1xN) and QD (1xN), and N is the number of robot joints.
+%
 % If Q, QD, TORQUE are matrices (KxN) then QDD is a matrix (KxN) where each row 
 % is the acceleration corresponding to the equivalent rows of Q, QD, TORQUE.
 %
-% QDD = R.accel(X) as above but X=[Q,QD,TORQUE].
+% QDD = R.accel(X) as above but X=[Q,QD,TORQUE] (1x3N).
 %
 % Note::
-% - Uses the method 1 of Walker and Orin to compute the forward dynamics.
-% - This form is useful for simulation of manipulator dynamics, in
+% - Useful for simulation of manipulator dynamics, in
 %   conjunction with a numerical integration function.
+% - Uses the method 1 of Walker and Orin to compute the forward dynamics.
+% - Featherstone's method is more efficient for robots with large numbers
+%   of joints.
+% - Joint friction is considered.
 %
 % References::
 % - Efficient dynamic computer simulation of robotic mechanisms,
 %   M. W. Walker and D. E. Orin,
 %   ASME Journa of Dynamic Systems, Measurement and Control, vol. 104, no. 3, pp. 205-211, 1982.
 %
-% See also SerialLink.rne, SerialLink, ode45.
+% See also SerialLink.fdyn, SerialLink.rne, SerialLink, ode45.
 
 
-% Copyright (C) 1993-2014, by Peter I. Corke
+
+% Copyright (C) 1993-2017, by Peter I. Corke
 %
 % This file is part of The Robotics Toolbox for MATLAB (RTB).
 % 
@@ -93,7 +99,7 @@ function qdd = accel(robot, Q, qd, torque)
 	% compute current manipulator inertia
 	%   torques resulting from unit acceleration of each joint with
 	%   no gravity.
-	M = rne(robot, ones(n,1)*q, zeros(n,n), eye(n), [0;0;0]);
+	M = rne(robot, ones(n,1)*q, zeros(n,n), eye(n), 'gravity', [0 0 0]);
 
 	% compute gravity and coriolis torque
 	%    torques resulting from zero acceleration at given velocity &

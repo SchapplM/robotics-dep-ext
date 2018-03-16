@@ -1,4 +1,4 @@
-%ISROT Test if argument is a rotation matrix
+%ISROT Test if SO(3) rotation matrix
 %
 % ISROT(R) is true (1) if the argument is of dimension 3x3 or 3x3xN, else false (0).
 %
@@ -8,11 +8,12 @@
 % Notes::
 % - A valid rotation matrix has determinant of 1.
 %
-% See also ISHOMOG, ISVEC.
+% See also ISHOMOG, ISROT2, ISVEC.
 
 
 
-% Copyright (C) 1993-2014, by Peter I. Corke
+
+% Copyright (C) 1993-2017, by Peter I. Corke
 %
 % This file is part of The Robotics Toolbox for MATLAB (RTB).
 % 

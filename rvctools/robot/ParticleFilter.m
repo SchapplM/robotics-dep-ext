@@ -26,7 +26,7 @@
 % Example::
 %
 % Create a landmark map
-%    map = Map(20);
+%    map = PointMap(20);
 % and a vehicle with odometry covariance and a driver
 %    W = diag([0.1, 1*pi/180].^2);
 %    veh = Vehicle(W);
@@ -70,10 +70,11 @@
 %   Peter Corke,
 %   Springer 2011
 %
-% See also Vehicle, RandomPath, RangeBearingSensor, Map, EKF.
+% See also Vehicle, RandomPath, RangeBearingSensor, PointMap, EKF.
 
 
-% Copyright (C) 1993-2014, by Peter I. Corke
+
+% Copyright (C) 1993-2017, by Peter I. Corke
 %
 % This file is part of The Robotics Toolbox for MATLAB (RTB).
 % 
@@ -119,6 +120,8 @@ classdef ParticleFilter < handle
         randstream
         seed0
         w0
+        x0          % initial particle distribution
+        anim
     end % properties
 
     methods
@@ -126,8 +129,8 @@ classdef ParticleFilter < handle
             %ParticleFilter.ParticleFilter Particle filter constructor
             %
             % PF = ParticleFilter(VEHICLE, SENSOR, Q, L, NP, OPTIONS) is a particle
-            % filter that estimates the state of the VEHICLE with a sensor
-            % SENSOR.  Q is covariance of the noise added to the particles
+            % filter that estimates the state of the VEHICLE with a landmark sensor
+            % SENSOR.  Q is the covariance of the noise added to the particles
             % at each step (diffusion), L is the covariance used in the
             % sensor likelihood model, and NP is the number of particles.
             %
@@ -139,16 +142,19 @@ classdef ParticleFilter < handle
             %               be a proper random number generator state such as saved in
             %               the seed0 property of an earlier run.
             % 'nohistory'   Don't save history.
+            % 'x0'          Initial particle states (Nx3)
             %
             % Notes::
-            % - ParticleFilter subclasses Handle, so it is a reference object.
-            % - The initial particle distribution is uniform over the map,
-            %   essentially the kidnapped robot problem which is quite unrealistic.
-            % - The 'private' option creates a private random number stream for the methods 
-            %   rand, randn and randi.  If not given the global stream is used.
+            % - ParticleFilter subclasses Handle, so it is a reference object. 
+            % - If initial particle states not given they are set to a uniform
+            %   distribution over the map, essentially the kidnapped robot problem
+            %   which is quite unrealistic.
+            % - Initial particle weights are always set to unity. 
+            % - The 'private' option creates a private random number stream for the
+            %   methods rand, randn and randi.  If not given the global stream is used.
             %
             %
-            % See also Vehicle, Sensor, RangeBearingSensor, Map.
+            % See also Vehicle, Sensor, RangeBearingSensor, PointMap.
 
             pf.robot = robot;
             pf.sensor = sensor;
@@ -161,11 +167,15 @@ classdef ParticleFilter < handle
             pf.x = [];
             pf.weight = [];
             pf.w0 = 0.05;
+            pf.x0 = [];
 
             opt.private = false;
             opt.reset = false;
             opt.seed = [];
             opt.history = true;
+            opt.x0 = [];
+            opt.movie = [];
+
 
             opt = tb_optparse(opt, varargin);
 
@@ -189,7 +199,14 @@ classdef ParticleFilter < handle
 
             % save the current state in case it later turns out to give interesting results
             pf.seed0 = pf.randstream.State;
+            
+            if opt.x0
+                pf.x0 = opt.x0;
+            end
 
+            if ~isempty(opt.movie)
+                pf.anim = Animate(opt.movie);
+            end
         end
 
 
@@ -200,13 +217,19 @@ classdef ParticleFilter < handle
             % history.
             %
             % Notes::
+            % - If initial particle states were given to the constructor the states are
+            %   set to this value, else a random distribution over the map is used.
             % - Invoked by the run() method.
             pf.robot.init();
             pf.history = [];
 
-            % create initial particle distribution as uniformly randomly distributed
-            % over the map area and heading angles
-            pf.x = (2*pf.rand([pf.nparticles,3]) - 1) * diag([pf.dim, pf.dim, pi]);
+            if pf.x0
+                pf.x = pf.x0;   % assign initial particle states
+            else
+                % create initial particle distribution as uniformly randomly distributed
+                % over the map area and heading angles
+                pf.x = (2*pf.rand([pf.nparticles,3]) - 1) * diag([pf.dim, pf.dim, pi]);
+            end
             pf.weight = ones(pf.nparticles, 1);
 
             pf.x_est = [];
@@ -237,8 +260,13 @@ classdef ParticleFilter < handle
 
             % display the initial particles
             pf.h = plot3(pf.x(:,1), pf.x(:,2), pf.x(:,3), 'g.');
-
+            set(pf.h, 'Tag', 'particles');
+            
             pf.robot.plot();
+            
+            if ~isempty(pf.anim)
+                pf.anim.add();
+            end
 
             % iterate over time
             for i=1:niter
@@ -279,6 +307,10 @@ classdef ParticleFilter < handle
                 pf.robot.plot();
                 drawnow
             end
+            
+            if ~isempty(pf.anim)
+                pf.anim.add();
+            end
 
             if pf.keephistory
                 hist = [];
@@ -297,8 +329,15 @@ classdef ParticleFilter < handle
             hold on
             for p = 1:pf.nparticles
                 x = pf.x(p,:);
-                plot3([x(1) x(1)], [x(2) x(2)], [0 pf.weight(p)]);
+                plot3([x(1) x(1)], [x(2) x(2)], [0 pf.weight(p)], 'r');
+                plot3([x(1) x(1)], [x(2) x(2)], [0 pf.weight(p)], 'k.', 'MarkerSize', 12);
+
             end
+            grid on
+            xyzlabel
+            zlabel('particle weight')
+            view(30,60);
+            rotate3d on
         end
 
         function plot_xy(pf, varargin)

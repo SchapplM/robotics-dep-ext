@@ -1,67 +1,83 @@
 %OPTPARSE Standard option parser for Toolbox functions
 %
-% [OPTOUT,ARGS] = TB_OPTPARSE(OPT, ARGLIST) is a generalized option parser for
-% Toolbox functions.  It supports options that have an assigned value, boolean 
-% or enumeration types (string or int).
+% OPTOUT = TB_OPTPARSE(OPT, ARGLIST) is a generalized option parser for
+% Toolbox functions.  OPT is a structure that contains the names and
+% default values for the options, and ARGLIST is a cell array containing
+% option parameters, typically it comes from VARARGIN.  It supports options
+% that have an assigned value, boolean or enumeration types (string or
+% int).
 %
 % The software pattern is:
 %
 %       function(a, b, c, varargin)
-%       opt.foo = true;
-%       opt.bar = false;
-%       opt.blah = [];
-%       opt.choose = {'this', 'that', 'other'};
-%       opt.select = {'#no', '#yes'};
-%       opt = tb_optparse(opt, varargin);
+%          opt.foo = false;
+%          opt.bar = true;
+%          opt.blah = [];
+%          opt.stuff = {};
+%          opt.choose = {'this', 'that', 'other'};
+%          opt.select = {'#no', '#yes'};
+%          opt = tb_optparse(opt, varargin);
 %
 % Optional arguments to the function behave as follows:
-%   'foo'           sets opt.foo <- true
-%   'nobar'         sets opt.foo <- false
-%   'blah', 3       sets opt.blah <- 3
-%   'blah', {x,y}   sets opt.blah <- {x,y}
-%   'that'          sets opt.choose <- 'that'
-%   'yes'           sets opt.select <- 2 (the second element)
+%   'foo'              sets opt.foo := true
+%   'nobar'            sets opt.foo := false
+%   'blah', 3          sets opt.blah := 3
+%   'blah',{x,y}       sets opt.blah := {x,y}
+%   'that'             sets opt.choose := 'that'
+%   'yes'              sets opt.select := (the second element)
+%   'stuff', 5         sets opt.stuff to {5}
+%   'stuff', {'k',3}   sets opt.stuff to {'k',3}
 %
 % and can be given in any combination.
 %
-% If neither of 'this', 'that' or 'other' are specified then opt.choose <- 'this'.
+% If neither of 'this', 'that' or 'other' are specified then opt.choose := 'this'.
 % Alternatively if:
 %        opt.choose = {[], 'this', 'that', 'other'};
-% then if neither of 'this', 'that' or 'other' are specified then opt.choose <- []
+% then if neither of 'this', 'that' or 'other' are specified then opt.choose := []
 %
-% If neither of 'no' or 'yes' are specified then opt.select <- 1.
+% If neither of 'no' or 'yes' are specified then opt.select := 1.
 %
 % Note:
 % - That the enumerator names must be distinct from the field names.
 % - That only one value can be assigned to a field, if multiple values
-%    are required they must be converted to a cell array.
+%   are required they must placed in a cell array.
 % - To match an option that starts with a digit, prefix it with 'd_', so
 %   the field 'd_3d' matches the option '3d'.
+% - OPT can be an object, rather than a structure, in which case the passed
+%   options are assigned to properties.
+%
+% The return structure is automatically populated with fields: verbose and
+% debug.  The following options are automatically parsed:
+%   'verbose'       sets opt.verbose := true
+%   'verbose=2'     sets opt.verbose := 2 (very verbose)
+%   'verbose=3'     sets opt.verbose := 3 (extremeley verbose)
+%   'verbose=4'     sets opt.verbose := 4 (ridiculously verbose)
+%   'debug', N      sets opt.debug := N
+%   'showopt'       displays opt and arglist
+%   'setopt',S      sets opt := S, if S.foo=4, and opt.foo is present, then
+%                   opt.foo is set to 4.
 %
 % The allowable options are specified by the names of the fields in the
 % structure opt.  By default if an option is given that is not a field of 
 % opt an error is declared.  
 %
-% Sometimes it is useful to collect the unassigned options and this can be 
-% achieved using a second output argument
-%           [opt,arglist] = tb_optparse(opt, varargin);
-% which is a cell array of all unassigned arguments in the order given in
-% varargin.
+% [OPTOUT,ARGS] = TB_OPTPARSE(OPT, ARGLIST) as above but returns all the
+% unassigned options, those that don't match anything in OPT, as a cell
+% array of all unassigned arguments in the order given in ARGLIST.
 %
-% The return structure is automatically populated with fields: verbose and
-% debug.  The following options are automatically parsed:
-%   'verbose'           sets opt.verbose <- true
-%   'verbose=2'         sets opt.verbose <- 2 (very verbose)
-%   'verbose=3'         sets opt.verbose <- 3 (extremeley verbose)
-%   'verbose=4'         sets opt.verbose <- 4 (ridiculously verbose)
-%   'debug', N          sets opt.debug <- N
-%   'setopt', S         sets opt <- S
-%   'showopt'           displays opt and arglist
+% [OPTOUT,ARGS,LS] = TB_OPTPARSE(OPT, ARGLIST) as above but if any
+% unmatched option looks like a MATLAB LineSpec (eg. 'r:') it is placed in LS rather
+% than in ARGS.
+%
+% [OBJOUT,ARGS,LS] = TB_OPTPARSE(OPT, ARGLIST, OBJ) as above but properties
+% of OBJ with matching names in OPT are set.
+
 
 % Ryan Steindl based on Robotics Toolbox for MATLAB (v6 and v9)
 %
 
-% Copyright (C) 1993-2014, by Peter I. Corke
+
+% Copyright (C) 1993-2017, by Peter I. Corke
 %
 % This file is part of The Robotics Toolbox for MATLAB (RTB).
 % 
@@ -82,12 +98,16 @@
 
 % Modifications by Joern Malzahn to support classes in addition to structs
 
-function [opt,others] = tb_optparse(in, argv)
+function [opt,others,ls] = tb_optparse(in, argv, cls)
 
     if nargin == 1
         argv = {};
     end
 
+    if nargin < 3
+        cls = [];
+    end
+    
     if ~iscell(argv)
         error('RTB:tboptparse:badargs', 'input must be a cell array');
     end
@@ -169,9 +189,16 @@ function [opt,others] = tb_optparse(in, argv)
                         % otherwise grab its value from the next arg
                         try
                             opt.(option) = argv{argc+1};
+                            if iscell(in.(option)) && isempty(in.(option))
+                                % input was an empty cell array
+                                if ~iscell(opt.(option))
+                                    % make it a cell
+                                    opt.(option) = cell( opt.(option) );
+                                end
+                            end
                         catch me
                             if strcmp(me.identifier, 'MATLAB:badsubscript')
-                                error('RTB:tboptparse:badargs', 'too few arguments provided');
+                                error('RTB:tboptparse:badargs', 'too few arguments provided for option: [%s]', option);
                             else
                                 rethrow(me);
                             end
@@ -181,10 +208,10 @@ function [opt,others] = tb_optparse(in, argv)
                     assigned = true;
                 elseif length(option)>2 && strcmp(option(1:2), 'no') && isfield(opt, option(3:end))
                     %* BOOLEAN OPTION PREFIXED BY 'no'
-                    val = opt.(option)(3:end);
+                    val = opt.(option(3:end));
                     if islogical(val)
                         % a logical variable can only be set by an option
-                        opt.(option)(3:end) = false;
+                        opt.(option(3:end)) = false;
                         assigned = true;
                     end
                 else
@@ -231,7 +258,7 @@ function [opt,others] = tb_optparse(in, argv)
         end
         if ~assigned
             % non matching options are collected
-            if nargout == 2
+            if nargout >= 2
                 arglist = [arglist argv(argc)];
             else
                 if isstr(argv{argc})
@@ -246,14 +273,14 @@ function [opt,others] = tb_optparse(in, argv)
     % copy choices into the opt structure
     if ~isempty(choices)
         for field=fieldnames(choices)'
-           opt.(field{1}) = choices.(field{1});
+            opt.(field{1}) = choices.(field{1});
         end
     end
-
+ 
     % if enumerator value not assigned, set the default value
     if ~isempty(in)
         for field=fieldnames(in)'
-            if iscell(in.(field{1})) && iscell(opt.(field{1}))
+            if iscell(in.(field{1})) && ~isempty(in.(field{1})) && iscell(opt.(field{1}))
                 val = opt.(field{1});
                 if isempty(val{1})
                     opt.(field{1}) = val{1};
@@ -265,6 +292,8 @@ function [opt,others] = tb_optparse(in, argv)
             end
         end
     end
+    
+    % opt is now complete
                         
     if showopt
         fprintf('Options:\n');
@@ -272,6 +301,56 @@ function [opt,others] = tb_optparse(in, argv)
         arglist
     end
 
-    if nargout == 2
+    % however if a class was passed as a second argument, set its properties
+    % according to the fields of opt
+    if ~isempty(cls)
+
+        for field=fieldnames(opt)'
+            if isprop(cls, field{1})
+                cls.(field{1}) = opt.(field{1});
+            end
+        end
+        
+        opt = cls;
+    end
+    
+    if nargout == 3
+        % check to see if there is a valid linespec floating about in the
+        % unused arguments
+        ls = [];
+        for i=1:length(arglist)
+            s = arglist{i};
+            if ~ischar(s)
+                continue;
+            end
+            % get color
+            [b,e] = regexp(s, '[rgbcmywk]');
+            s2 = s(b:e);
+            s(b:e) = [];
+            
+            % get line style
+            [b,e] = regexp(s, '(--)|(-.)|-|:');
+            s2 = [s2 s(b:e)];
+            s(b:e) = [];
+            
+            % get marker style
+            [b,e] = regexp(s, '[o\+\*\.xsd\^v><ph]');
+            s2 = [s2 s(b:e)];
+            s(b:e) = [];
+            
+            % found one
+            if length(s) == 0
+                ls = arglist{i};
+                arglist(i) = [];
+                break;
+            end
+        end
+        others = arglist;
+        if isempty(ls)
+            ls = {};
+        else
+            ls = {ls};
+        end
+    elseif nargout == 2
         others = arglist;
     end

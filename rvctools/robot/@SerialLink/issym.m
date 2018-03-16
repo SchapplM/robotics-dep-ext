@@ -1,16 +1,12 @@
-%SerialLink.issym Check if Link or SerialLink object is a symbolic model
-%
-% res = L.issym() is true if the Link L has symbolic parameters.
+%SerialLink.issym Test if SerialLink object is a symbolic model
 %
 % res = R.issym() is true if the SerialLink manipulator R has symbolic parameters
 %
 %
 % Authors::
-% Jörn Malzahn   
-% 2012 RST, Technische Universität Dortmund, Germany
-% http://www.rst.e-technik.tu-dortmund.de    
+%  Joern Malzahn, (joern.malzahn@tu-dortmund.de) 
 
-% Copyright (C) 1993-2014, by Peter I. Corke
+% Copyright (C) 1993-2015, by Peter I. Corke
 %
 % This file is part of The Robotics Toolbox for MATLAB (RTB).
 % 

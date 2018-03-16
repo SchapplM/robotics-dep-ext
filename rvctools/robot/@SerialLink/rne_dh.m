@@ -13,7 +13,8 @@
 
 
 
-% Copyright (C) 1993-2014, by Peter I. Corke
+
+% Copyright (C) 1993-2017, by Peter I. Corke
 %
 % This file is part of The Robotics Toolbox for MATLAB (RTB).
 % 
@@ -81,7 +82,7 @@ function [tau,wbase] = rne_dh(robot, a1, a2, a3, a4, a5)
     end
     
     if robot.issym || any([isa(Q,'sym'), isa(Qd,'sym'), isa(Qdd,'sym')])
-        tau(np, n) = sym();
+        tau = zeros(np,n, 'sym');
     else
         tau = zeros(np,n);
     end
@@ -99,9 +100,12 @@ function [tau,wbase] = rne_dh(robot, a1, a2, a3, a4, a5)
             pstarm = [];
         end
         Rm = [];
-        w = zeros(3,1);
-        wd = zeros(3,1);
-        vd = grav(:);
+        
+        % rotate base velocity and acceleration into L1 frame
+        Rb = t2r(robot.base)';
+        w = Rb*zeros(3,1);
+        wd = Rb*zeros(3,1);
+        vd = Rb*grav(:);
 
     %
     % init some variables, compute the link rotation matrices
@@ -109,23 +113,18 @@ function [tau,wbase] = rne_dh(robot, a1, a2, a3, a4, a5)
         for j=1:n
             link = robot.links(j);
             Tj = link.A(q(j));
-            if link.RP == 'R'
-                d = link.d;
-            else
-                d = q(j);
+            switch link.type
+                case 'R'
+                    d = link.d;
+                case 'P'
+                    d = q(j);
             end
             alpha = link.alpha;
+            % O_{j-1} to O_j in {j}, negative inverse of link xform
             pstar = [link.a; d*sin(alpha); d*cos(alpha)];
-            if j == 1
-                % Was bewirkt diese Zeile? Durch spätere Verwendung von
-                % pstar wird das Drehmoment auf den Welt-Ursprung (0,0,0)
-                % bezogen, obwohl das erste Gelenk sich dort gar nicht
-                % befindet!
-                % pstar = t2r(robot.base) * pstar;
-                Tj = robot.base * Tj;
-            end
+
             pstarm(:,j) = pstar;
-            Rm{j} = t2r(Tj); % Rotation vom verherigen zum nächsten
+            Rm{j} = t2r(Tj);
             if debug>1
                 Rm{j}
                 Pstarm(:,j).'
@@ -139,56 +138,45 @@ function [tau,wbase] = rne_dh(robot, a1, a2, a3, a4, a5)
             link = robot.links(j);
 
             Rt = Rm{j}.';    % transpose!!
-            % Vektor vom vorherigen zum nächsten Koordinatensystem
             pstar = pstarm(:,j);
             r = link.r;
 
             %
             % statement order is important here
             %
-            if link.RP == 'R'
-                % revolute axis
-                % Winkelbeschleunigung des Körpers
-                % Robotik I, Gl. (7.12)
-                wd = Rt*(wd + z0*qdd(j) + ...
-                    cross(w,z0*qd(j)));
-                % Winkelgeschwindigkeit des Körpers
-                % Robotik I, Gl. (7.11)
-                w = Rt*(w + z0*qd(j));
-                %v = cross(w,pstar) + Rt*v;
-                % Beschleunigung des körperfesten Koordinatensystems
-                % Robotik I, Gl. (7.15)
-                vd = cross(wd,pstar) + ...
-                    cross(w, cross(w,pstar)) +Rt*vd;
-
-            else
-                % prismatic axis
-                w = Rt*w;
-                wd = Rt*wd;
-                vd = Rt*(z0*qdd(j)+vd) + ...
-                    cross(wd,pstar) + ...
-                    2*cross(w,Rt*z0*qd(j)) +...
-                    cross(w, cross(w,pstar));
+            switch link.type
+                case 'R'
+                    % revolute axis
+                    wd = Rt*(wd + z0*qdd(j) + ...
+                        cross(w,z0*qd(j)));
+                    w = Rt*(w + z0*qd(j));
+                    %v = cross(w,pstar) + Rt*v;
+                    vd = cross(wd,pstar) + ...
+                        cross(w, cross(w,pstar)) +Rt*vd;
+                    
+                case 'P'
+                    % prismatic axis
+                    w = Rt*w;
+                    wd = Rt*wd;
+                    vd = Rt*(z0*qdd(j)+vd) + ...
+                        cross(wd,pstar) + ...
+                        2*cross(w,Rt*z0*qd(j)) +...
+                        cross(w, cross(w,pstar));
             end
 
             %whos
-            % Translatorische Beschleunigung des Schwerpunkts
-            % Robotik I, Gl. (7.22)
             vhat = cross(wd,r.') + ...
                 cross(w,cross(w,r.')) + vd;
-            % Kraft (linke Seite), Robotik I, Gl. (7.31)
             F = link.m*vhat;
-            % Drehmoment (linke Seite), Robotik I, Gl. (7.32). In
-            % Körperkoordinatensystem
             N = link.I*wd + cross(w,link.I*w);
             Fm = [Fm F];
             Nm = [Nm N];
 
             if debug
-                fprintf('w: '); fprintf('%.3f ', w)
-                fprintf('\nwd: '); fprintf('%.3f ', wd)
-                fprintf('\nvd: '); fprintf('%.3f ', vd)
-                fprintf('\nvdbar: '); fprintf('%.3f ', vhat)
+                fprintf('w: '); disp( w)
+                fprintf('\nwd: '); disp( wd)
+                fprintf('\nvd: '); disp( vd)
+                fprintf('\nvdbar: '); disp( vhat)
                 fprintf('\n');
             end
         end
@@ -215,35 +203,30 @@ function [tau,wbase] = rne_dh(robot, a1, a2, a3, a4, a5)
                 R = Rm{j+1};
             end
             r = link.r;
-            % Robotik I, Gl. (7.32)
-            % Drehmoment in aktuelles Gelenk-Koordinatensystem
-            % transformieren
             nn = R*(nn + cross(R.'*pstar,f)) + ...
                 cross(pstar+r.',Fm(:,j)) + ...
                 Nm(:,j);
-            % 
             f = R*f + Fm(:,j);
             if debug
-                fprintf('f: '); fprintf('%.3f ', f)
-                fprintf('\nn: '); fprintf('%.3f ', nn)
+                fprintf('f: '); disp( f)
+                fprintf('\nn: '); disp( nn)
                 fprintf('\n');
             end
 
             R = Rm{j};
-            if link.RP == 'R'
-                % revolute
-                %tau(p,j) = nn.'*(R.'*z0) + ...
-                % Drehmoment auf aktuelle z-Achse projizieren
-                t = nn.'*(R.'*z0) + ...
-                    link.G^2 * link.Jm*qdd(j) - ... % Antriebsstrangmodel berücksichtigen
-                     link.friction(qd(j)); % Reibungsmodell berücksichtigen
-                tau(p,j) = t;
-            else
-                % prismatic
-                t = f.'*(R.'*z0) + ...
-                    link.G^2 * link.Jm*qdd(j) - ...
-                    link.friction(qd(j));
-                tau(p,j) = t;
+            switch link.type
+                case 'R'
+                    % revolute
+                    t = nn.'*(R.'*z0) + ...
+                        link.G^2 * link.Jm*qdd(j) - ...
+                        link.friction(qd(j));
+                    tau(p,j) = t;
+                case 'P'
+                    % prismatic
+                    t = f.'*(R.'*z0) + ...
+                        link.G^2 * link.Jm*qdd(j) - ...
+                        link.friction(qd(j));
+                    tau(p,j) = t;
             end
         end
         % this last bit needs work/testing

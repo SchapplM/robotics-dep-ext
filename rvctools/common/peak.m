@@ -6,27 +6,30 @@
 % in the vector Y.
 %
 % [YP,XP] = PEAK(Y, X, OPTIONS) as above but also returns the corresponding 
-% x-coordinates of the maxima in the vector Y.  X is the same length of Y
+% x-coordinates of the maxima in the vector Y.  X is the same length as Y
 % and contains the corresponding x-coordinates.
 %
 % Options::
 % 'npeaks',N    Number of peaks to return (default all)
 % 'scale',S     Only consider as peaks the largest value in the horizontal 
 %               range +/- S points.
-% 'interp',N    Order of interpolation polynomial (default no interpolation)
+% 'interp',M    Order of interpolation polynomial (default no interpolation)
 % 'plot'        Display the interpolation polynomial overlaid on the point data
 %
 % Notes::
+% - A maxima is defined as an element that larger than its two neighbours.
+%   The first and last element will never be returned as maxima.
 % - To find minima, use PEAK(-V).
 % - The interp options fits points in the neighbourhood about the peak with
-%   an N'th order polynomial and its peak position is returned.  Typically
-%   choose N to be odd.
+%   an M'th order polynomial and its peak position is returned.  Typically
+%   choose M to be even.  In this case XP will be non-integer.
 %
 % See also PEAK2.
 
 
 
-% Copyright (C) 1993-2014, by Peter I. Corke
+
+% Copyright (C) 1993-2017, by Peter I. Corke
 %
 % This file is part of The Robotics Toolbox for MATLAB (RTB).
 % 
@@ -63,9 +66,7 @@ function [yp,xpout] = peak(y, varargin)
     if ~isempty(args)
         x = args{1};
         x = x(:);
-        if length(x) ~= length(y)
-            error('second argument must be same length as first');
-        end
+        assert(length(x) == length(y), 'RTB:peak:interp', 'second argument must be same length as first');
     else
         x = [1:length(y)]';
     end
@@ -87,7 +88,8 @@ function [yp,xpout] = peak(y, varargin)
     k = k(i);    % indice of the maxima
 
     if opt.npeaks
-        k = k(1:opt.npeaks);
+        np = min(length(k), opt.npeaks);
+        k = k(1:np);
     end
 
     % optionally plot the discrete data
@@ -99,9 +101,7 @@ function [yp,xpout] = peak(y, varargin)
 
     % interpolate the peaks if required
     if opt.interp
-        if opt.interp < 2
-            error('interpolation polynomial must be at least second order');
-        end
+        assert(opt.interp >= 2, 'RTB:peak:badarg',  'interpolation polynomial must be at least second order');
         
         xp = [];
         yp = [];

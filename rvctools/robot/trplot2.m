@@ -5,16 +5,25 @@
 %
 % H = TRPLOT2(T, OPTIONS) as above but returns a handle.
 %
+% H = TRPLOT2() creates a default frame EYE(2,2) at the origin and returns a
+% handle.
+%
+% Animation::
+%
+% Firstly, create a plot and keep the the handle as per above.
+%
 % TRPLOT2(H, T) moves the coordinate frame described by the handle H to
 % the SE(2) pose T (3x3).
 %
 % Options::
+% 'handle',h         Update the specified handle
 % 'axis',A           Set dimensions of the MATLAB axes to A=[xmin xmax ymin ymax]
 % 'color', c         The color to draw the axes, MATLAB colorspec
 % 'noaxes'           Don't display axes on the plot
 % 'frame',F          The frame is named {F} and the subscript on the axis labels is F.
+% 'framelabel',F     The coordinate frame is named {F}, axes have no subscripts.
 % 'text_opts', opt   A cell array of Matlab text properties
-% 'handle', h        Draw in the MATLAB axes specified by h
+% 'axhandle',A       Draw in the MATLAB axes specified by A
 % 'view',V           Set plot view parameters V=[az el] angles, or 'auto' 
 %                    for view toward origin of coordinate frame
 % 'length',s         Length of the coordinate frame arms (default 1)
@@ -23,19 +32,24 @@
 %
 % Examples::
 %
-%       trplot(T, 'frame', 'A')
-%       trplot(T, 'frame', 'A', 'color', 'b')
-%       trplot(T1, 'frame', 'A', 'text_opts', {'FontSize', 10, 'FontWeight', 'bold'})
+%       trplot2(T, 'frame', 'A')
+%       trplot2(T, 'frame', 'A', 'color', 'b')
+%       trplot2(T1, 'frame', 'A', 'text_opts', {'FontSize', 10, 'FontWeight', 'bold'})
 %
 % Notes::
-% - The arrow option requires the third party package arrow3.
-% - Generally it is best to set the axis bounds
+% - Multiple frames can be added using the HOLD command
+% - The arrow option requires the third party package arrow3 from File
+%   Exchange.
+% - When using the form TRPLOT(H, ...) to animate a frame it is best to set 
+%   the axis bounds.
+% - The 'arrow' option requires arrow3 from FileExchange.
 %
 % See also TRPLOT.
 
 
 
-% Copyright (C) 1993-2014, by Peter I. Corke
+
+% Copyright (C) 1993-2017, by Peter I. Corke
 %
 % This file is part of The Robotics Toolbox for MATLAB (RTB).
 % 
@@ -62,39 +76,72 @@
 
 function hout = trplot2(T, varargin)
 
-    if isscalar(T) && ishandle(T)
-        % trplot(H, T)
-        H = T; T = varargin{1};
-        set(H, 'Matrix', se2t3(T));
-        return;
+    if nargin == 0
+        T = eye(2,2);
     end
-
+    
     opt.color = 'b';
+    opt.textcolor = [];
     opt.axes = true;
     opt.axis = [];
     opt.frame = [];
+    opt.framelabel = [];
     opt.text_opts = [];
     opt.view = [];
     opt.width = 1;
     opt.arrow = false;
     opt.handle = [];
+    opt.axhandle = [];
     opt.length = 1;
+    opt.lefty = false;
+    opt.framelabeloffset = 0.2*[1 1];
+    opt.handle = [];
 
-    opt = tb_optparse(opt, varargin);
+    [opt,args] = tb_optparse(opt, varargin);
 
+    if opt.arrow && ~exist('arrow3')
+        opt.arrow = false;
+        warning('RTB:trplot:badarg', 'arrow option requires arrow3 from FileExchange');
+    end
+    
+    if isscalar(T) && ishandle(T)
+        warning('RTB:trplot2:deprecated', 'Use ''handle'' option');
+        % trplot(H, T)
+        opt.handle = T; T = args{1};
+    end
+    
+    % ensure it's SE(2)
+    if all(size(T) == [2 2])
+        T = [T [0; 0]; 0 0 1];
+    end
+    
+    if ~isempty(opt.handle)
+        set(opt.handle, 'Matrix', se2t3(T));
+        if nargout > 0
+            hout = opt.handle;
+        end
+        return;
+    end
+    
+    if isempty(opt.textcolor)
+        opt.textcolor = opt.color;
+    end
+   
     if isempty(opt.text_opts)
         opt.text_opts = {};
     end
+    
+    % figure the dimensions of the axes, if not given
     if isempty(opt.axis)
         if all(size(T) == [3 3]) || norm(transl(T)) < eps
-            c = transl(T);
+            c = transl2(T);
             d = 1.2;
             opt.axis = [c(1)-d c(1)+d c(2)-d c(2)+d];
         end
     end
 
-    if ~isempty(opt.handle)
-        hax = opt.handle;
+    if ~isempty(opt.axhandle)
+        hax = opt.axhandle;
         hold(hax);
     else
         ih = ishold;
@@ -105,6 +152,7 @@ function hout = trplot2(T, varargin)
                 axis(opt.axis);
             end
             %axis equal
+            daspect([1 1 1])
             
             if opt.axes
                 xlabel( 'X');
@@ -114,11 +162,19 @@ function hout = trplot2(T, varargin)
         hax = gca;
         hold on
     end
-
+    
     % create unit vectors
     o =  opt.length*[0 0 1]'; o = o(1:2);
     x1 = opt.length*[1 0 1]'; x1 = x1(1:2);
-    y1 = opt.length*[0 1 1]'; y1 = y1(1:2);
+    
+    if opt.lefty
+        y1 = opt.length*[0 -1 1]'; y1 = y1(1:2);
+    else
+        y1 = opt.length*[0 1 1]'; y1 = y1(1:2);
+    end
+    
+    opt.text_opts = [opt.text_opts, 'Color', opt.color];
+    
     
     % draw the axes
     
@@ -129,6 +185,7 @@ function hout = trplot2(T, varargin)
     if opt.arrow
         % draw the 2 arrows
         S = [opt.color num2str(opt.width)];
+        daspect([1 1 1]);
         ha = arrow3(mstart, mend, S);
         for h=ha'
             set(h, 'Parent', hg);
@@ -163,12 +220,20 @@ function hout = trplot2(T, varargin)
         set(h, 'Parent', hg);
     end
 
+    if ~isempty(opt.framelabel)
+        opt.frame = opt.framelabel;
+    end
     % label the frame
     if ~isempty(opt.frame)
-        h = text(o(1)-0.04*x1(1), o(2)-0.04*y1(2), ...
+        h = text(o(1), o(2), ...
             ['\{' opt.frame '\}'], 'Parent', hg);
         set(h, 'VerticalAlignment', 'middle', ...
+            'Color', opt.textcolor, ...
             'HorizontalAlignment', 'center', opt.text_opts{:});
+        e = get(h, 'Extent');
+        d = e(4); % use height of text box as a scale factor
+        e(1:2) = e(1:2) - opt.framelabeloffset * d;
+        set(h, 'Position', e(1:2));
     end
     
     if ~opt.axes

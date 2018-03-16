@@ -1,5 +1,5 @@
 % Robotics Toolbox.
-% Version 9.9.0  2014-04-28
+% Version 10.2.0  2018-03-11
 %
 %
 % Homogeneous transformations 3D
@@ -7,47 +7,48 @@
 %    angvec2tr                  - angle/vector to HT
 %    eul2r                      - Euler angles to RM
 %    eul2tr                     - Euler angles to HT
+%    ishomog                    - true if argument is a 4x4 matrix
+%    isunit                     - true if argument is a unit vector
+%    isrot                      - true if argument is a 3x3 matrix
 %    oa2r                       - orientation and approach vector to RM
 %    oa2tr                      - orientation and approach vector to HT
-%    r2t                        - RM to HT
-%    rt2tr                      - (R,t) to HT
 %    rotx                       - RM for rotation about X-axis
 %    roty                       - RM for rotation about Y-axis
 %    rotz                       - RM for rotation about Z-axis
 %    rpy2r                      - roll/pitch/yaw angles to RM
 %    rpy2tr                     - roll/pitch/yaw angles to HT
-%    t2r                        - HT to RM
 %    tr2angvec                  - HT/RM to angle/vector form
 %    tr2eul                     - HT/RM to Euler angles
 %    tr2rpy                     - HT/RM to roll/pitch/yaw angles
-%    tr2rt                      - HT to (R,t)
-%    tranimate                  - animate a coordinate frame
-%    trchain                    - evaluate a series of transforms
-%    tripleangle                - graphical interactive three angle rotation
 %    transl                     - set or extract the translational component of HT
+%    trchain                    - sequence of HT
+%    trinterp                   - interpolate an HT
+%    tripleangle                - GUI for triple angle visualization
 %    trnorm                     - normalize HT
-%    trchain                    - chain of SE(3) transforms
-%    trplot                     - plot HT as a coordinate frame
 %    trprint                    - print an HT
 %    trotx                      - HT for rotation about X-axis
 %    troty                      - HT for rotation about Y-axis
 %    trotz                      - HT for rotation about Z-axis
-%    trscale                    - HT for scale change
-%
-%  * HT: homogeneous transformation, a 4x4 matrix, in SE(3)
-%  * RM: rotation matrix, orthonormal 3x3 matrix, in SO(3)
-%  * Functions of the form tr2XX will also accept an HT or RM as the argument
+%    trlog                      - efficient logarithm
+%    trexp                      - efficient exponentiation
+%    trscale                    - pure scale change
 %
 % Homogeneous transformations 2D
-%    rot2                       - RM for SE(2) rotation
-%    se2                        - HT in SE(2)
-%    transl2                    - set or extract the translational component of SE(2) HT
-%    trchain2                   - chain of SE(2) transforms
-%    trot2                      - SO(2) rotation
-%    trplot2                    - plot HT, SE(2), as a coordinate frame
+%    ishomog2                   - true if argument is a 4x4 matrix
+%    isrot2                     - true if argument is a 3x3 matrix
+%    rot2                       - rotation matrix in 2D
+%    transl2                    - set or extract the translational component of HT
+%    trchain2                   - sequence of HT
+%    trexp2                     - exp in 2D
+%    trinterp2                  - interpolate an HT
+%    trot2                      - HT for rotation in 2D
+%    trprint2                   - print an HT
 %
-%  * HT: homogeneous transformation, a 3x3 matrix, in SE(2)
-%  * RM: rotation matrix, orthonormal 2x2 matrix, in SO(2)
+% Homogeneous transformation utilities
+%    r2t                        - RM to HT
+%    t2r                        - HT to RM
+%    rt2tr                      - (R,t) to HT
+%    tr2rt                      - HT to (R,t)
 %
 % Homogeneous points and lines
 %    e2h                        - Euclidean coordinates to homogeneous
@@ -55,14 +56,20 @@
 %    homline                    - create line from 2 points
 %    homtrans                   - transform points
 %
+%  * HT = homogeneous transformation, a 4x4 matrix, belongs to the group SE(3).
+%  * RM = RM, an orthonormal 3x3 matrix, belongs to the group SO(3).
+%  * Functions of the form <b>tr2XX</b> will also accept a RM as the argument.
+%
 % Differential motion
 %    delta2tr                   - differential motion vector to HT
 %    eul2jac                    - Euler angles to Jacobian
 %    rpy2jac                    - RPY angles to Jacobian
 %    skew                       - vector to skew symmetric matrix
+%    skewa                      - vector to augmented skew symmetric matrix
 %    tr2delta                   - HT to differential motion vector
 %    tr2jac                     - HT to Jacobian
 %    vex                        - skew symmetric matrix to vector
+%    vexa                       - augmented skew symmetric matrix to vector
 %    wtrans                     - transform wrench between frames
 %
 % Trajectory generation
@@ -73,71 +80,84 @@
 %    mstraj                     - multi-axis multi-segment trajectory
 %    tpoly                      - 1D polynomial trajectory
 %    trinterp                   - interpolate HT s
+%    trinterp2                  - interpolate HT s
 %
-% Quaternion
-%    Quaternion                 - constructor
-%    /                          - divide quaternion by quaternion or scalar
-%    *                          - multiply quaternion by a quaternion or vector
-%    inv                        - invert a quaternion
-%    norm                       - norm of a quaternion
-%    plot                       - display a quaternion as a 3D rotation
-%    unit                       - unitize a quaternion
-%    interp                     - interpolate a quaternion
+% Pose representation classes
+%    +ETS2                      - elementary transform sequence in 2D
+%    +ETS3                      - elementary transform sequence in 3D
+%    Quaternion                 - general quaternions
+%    SO2                        - rotations SO(2)
+%    SE2                        - poses SE(2)
+%    SO3                        - rotations SO(3)
+%    SE3                        - poses SE(3)
+%    Twist                      - 2D and 3D twists
+%    UnitQuaternion             - unit quaternions
+%    RTBPose                    - Abstract pose support
 %
 % Serial-link manipulator
-%    CodeGenerator              - construct a robot specific code generator object
+%    DHFactor                   - convert elementary transformations to DH form
+%    Link                       - construct a robot link object
+%    Prismatic                  - construct a prismatic link object
+%    PrismaticMDH               - construct a prismatic link object (MDH params)
+%    Revolute                   - construct a revolute link object
+%    RevoluteMDH                - construct a revolute link object (MDH params)
 %    SerialLink                 - construct a serial-link robot object
-%    Link                       - construct a general robot link object
-%    Prismatic                  - construct a prismatic robot link object
-%    Revolute                   - construct a revolute robot link object
-%    PrismaticMDH               - construct a prismatic robot link object
-%    RevoluteMDH                - construct a revolute robot link object
-%    *                          - compound two robots
 %    friction                   - return joint friction torques
 %    nofriction                 - return a robot object with no friction
 %    perturb                    - return a robot object with perturbed parameters
 %    plot                       - plot/animate robot
-%    plot3d                     - plot/animate robot as solid model
 %    teach                      - drive a graphical  robot
 %
 %     Models
+%        models                 - list/search all models
+%        mdl_KR5                - Kuka KR5
+%        mdl_S4ABB2p8           - ABB S4 2.8 (DH, kine)
+%        mdl_ball               - high DOF ball robot
+%        mdl_baxter             - Rethink Robotics Baxter
+%        mdl_cobra600           - Adept SCARA robot
+%        mdl_coil               - high DOF coiled robot
 %        mdl_Fanuc10L           - Fanuc 10L (DH, kine)
-%        mdl_irb140             - ABB IRB140 (DH, kine)
-%        mdl_irb140_mdh         - ABB IRB140 (MDH, kine)
-%        mdl_jaco               - Kinova Jaco arm (DH, kine)
-%        mdl_m16                - Fanuc M16 (DH, kine)
-%        mdl_mico               - Kinova Mico arm (DH, kine)
+%        mdl_hyper2d            - high DOF planar
+%        mdl_hyper3d            - high DOF 3D
+%        mdl_irb140             - ABB IRB140
+%        mdl_irb140_mdh         - ABB IRB140 (MDH)
+%        mdl_jaco               - Kinova Jaco (DH)
+%        mdl_KR5                - Kuka KR5  (DH)
+%        mdl_LWR                - Kuka LWR (DH)
+%        mdl_m16                - Fanuc M16
+%        mdl_mico               - Kinova Mico (DH)
 %        mdl_MotomanHP6         - Motoman HP6 (DH, kine)
-%        mdl_nao                - Alderabaran NAO arms and legs (DH, kine)
-%        mdl_phantomx           - PhantomX pincher 4DOF hobby arm (DH, kine)
+%        mdl_nao                - Alderbaran Nao humanoid
+%        mdl_p8                 - Puma 560 on an XY base
+%        mdl_phantomx           - PhantomX pincher
+%        mdl_planar1            - 1 line planar robot
+%        mdl_planar2            - 1 line planar robot
+%        mdl_planar3            - 1 line planar robot
 %        mdl_puma560            - Puma 560 data (DH, kine, dyn)
 %        mdl_puma560akb         - Puma 560 data (MDH, kine, dyn)
-%        mdl_S4ABB2p8           - ABB S4 2.8 (DH, kine)
+%        mdl_quadrotor          - simple quadcopter model
 %        mdl_stanford           - Stanford arm data (DH, kine, dyn)
-%        mdl_stanford_mdh       - Stanford arm data (MDH, kine, dyn)
-%        mdl_onelink            - simple 1-link example (DH, kine)
-%        mdl_planar1            - simple 1 link planar model (DH, kine)
-%        mdl_planar2            - simple 2 link planar model (DH, kine)
-%        mdl_planar3            - simple 3 link planar model (DH, kine)
-%        mdl_3link3d            - Simple 3DOF arm, no shoulder offset (DH, kine)
-%        mdl_twolink            - simple 2-link example (DH, kine, dyn)
+%        mdl_stanford_mdh       - Stanford arm data (MDH, kine)
+%        mdl_twolink            - simple 2-link example (DH, kine)
 %        mdl_twolink_mdh        - simple 2-link example (MDH, kine)
-%        mdl_ball               - high DOF chain that forms a ball
-%        mdl_coil               - high DOF chain that forms a coil
-%        mdl_hyper2d            - 2D high DOF chain
-%        mdl_hyper3d            - 3D high DOF chain
-%        mdl_quadcopter         - simple quadcopter model
+%        mdl_twolink_sym        - simple 2-link example (DH, kine, symbolic)
+%        mdl_ur3                - Universal Robotics UR3 (DH, kine, dyn)
+%        mdl_ur5                - Universal Robotics UR5 (DH, kine, dyn)
+%        mdl_ur10               - Universal Robotics UR10 (DH, kine, dyn)
 %
-%     Kinematic
+%     Kinematics
 %        DHFactor               - transform sequence to DH description
-%        jsingu                 - find dependent joints
+%        ETS2                   - simplified kinematics in 2D
+%        ETS3                   - simplified kinematics in 3D
+%        jsingu                 - find joint singularity
 %        fkine                  - forward kinematics
 %        ikine                  - inverse kinematics (numeric)
-%        ikine_sym              - inverse kinematics (symbolic)
 %        ikine6s                - inverse kinematics for 6-axis arm with sph.wrist
 %        jacob0                 - Jacobian in base coordinate frame
-%        jacobn                 - Jacobian in end-effector coordinate frame
+%        jacobe                 - Jacobian in end-effector coordinate frame
 %        maniplty               - compute manipulability
+%        trchain                - transform chain in 3D
+%        trchain2               - transform chain in 2D
 %
 %     Dynamics
 %        accel                  - forward dynamics
@@ -151,30 +171,36 @@
 %        rne                    - inverse dynamics
 %
 % Mobile robot
-%    Map                        - point feature map object
+%    LandmarkMap                - point feature map object
 %    RandomPath                 - driver for Vehicle object
 %    RangeBearingSensor         - "laser scanner" object
-%    Vehicle                    - construct a mobile robot object
+%    Vehicle                    - abstract vehicle superclass
+%    Bicycle                    - construct a mobile robot with bicycle like kinematics
+%    Unicycle                   - construct a mobile robot with unicycle like kinematics
 %    sl_bicycle                 - Simulink "bicycle model" of non-holonomic wheeled vehicle
 %    Navigation                 - Navigation superclass
 %    Sensor                     - robot sensor superclass
-%    makemap                    - build an occupancy grid
 %    plot_vehicle               - plot vehicle
 %
 %     Localization
 %        EKF                    - extended Kalman filter object
 %        ParticleFilter         - Monte Carlo estimator
+%        PoseGraph              - pose-graph SLAM
 %
 %     Path planning
 %        Bug2                   - bug navigation
 %        DXform                 - distance transform from map
 %        Dstar                  - D* planner
+%        Lattice                - lattice planner
 %        PRM                    - probabilistic roadmap planner
 %        RRT                    - rapidly exploring random tree
 %
 % Graphics
+%    circle                     - compute/draw points on a circle
+%    mplot                      - time series plotting
 %    plot2                      - plot trajectory
 %    plotp                      - plot points
+%    plotvol                    - set plot bounds
 %    plot_arrow                 - draw an arrow
 %    plot_box                   - draw a box
 %    plot_circle                - draw a circle
@@ -184,8 +210,10 @@
 %    plot_poly                  - plot polygon
 %    plot_sphere                - draw a sphere
 %    qplot                      - plot joint angle trajectories
-%    plot2                      - Plot trajectories
-%    plotp                      - Plot trajectories
+%    trplot                     - plot HT as a coordinate frame
+%    trplot2                    - plot HT, SE(2), as a coordinate frame
+%    tranimate                  - animate a coordinate frame
+%    tranimate2                 - animate a coordinate frame
 %    xaxis                      - set x-axis scaling
 %    yaxis                      - set y-axis scaling
 %    xyzlabel                   - label axes x, y and z
@@ -193,49 +221,35 @@
 % Utility
 %    about                      - summary of object size and type
 %    angdiff                    - subtract 2 angles modulo 2pi
-%    arrow3                     - draw a 3D arrow (third party code)
 %    bresenham                  - Bresenhan line drawing
-%    circle                     - compute/draw points on a circle
 %    colnorm                    - columnwise norm of matrix
-%    colorname                  - map color name to RGB
 %    diff2                      - elementwise diff
-%    edgelist                   - trace edge of a shape
+%    distancexform              - compute distance transform
+%    edgelist                   - trace edge of a blob
 %    gauss2d                    - Gaussian distribution in 2D
-%    ishomog                    - true if argument is a 4x4 matrix
 %    ismatrix                   - true if non scalar
-%    isrot                      - true if argument is a 3x3 matrix
 %    isvec                      - true if argument is a 3-vector
+%    isunit                     - true if argument is a unit vector
 %    numcols                    - number of columns in matrix
 %    numrows                    - number of rows in matrix
 %    peak                       - find peak in 1D signal
 %    peak2                      - find peak in 2D signal
 %    PGraph                     - general purpose graph class
+%    pickregion                 - pick a region in figure
+%    Plucker                    - Plucker line class
 %    polydiff                   - derivative of polynomial
 %    Polygon                    - general purpose polygon class
 %    randinit                   - initialize random number generator
 %    ramp                       - create linear ramp
+%    runscript                  - step through a script file
 %    unit                       - unitize a vector
 %    tb_optparse                - toolbox argument parser
-%    distancexform              - compute distance transform
-%    runscript                  - interactively step through a script
-%    multidfprintf              - printf extension
+%    stlRead                    - read an STL file
+%    RTBPlot                    - graphics support
+%    chi2inv_rtb                - simple inverse chi squared
 %
 % Demonstrations
 %    rtbdemo                    - Serial-link manipulator demonstration
-%    tripleangle                - demonstrate angle sequences
-%
-% Interfacing
-%    RobotArm                   - Connect SerialLink object to real robot
-%    joystick                   - Help for joystick interface mex file
-%    joy2tr                     - Update HT based on joystick input
-%    VREP                       - VREP interface class
-%    VREP_mirror                - MATLAB mirror for VREP object
-%    VREP_arm                   - MATLAB mirror for VREP robot arm
-%    VREP_obj                   - MATLAB mirror for VREP object
-%    VREP_camera                - MATLAB mirror for VREP camera object
-%
-%  *  Arbotix class in the folder robot/interfaces
-%  *  VREP classes are in the folder robot/interfaces/VREP
 %
 % Examples
 %    sl_quadcopter              - Simulink model of a flying quadcopter

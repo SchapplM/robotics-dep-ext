@@ -4,7 +4,7 @@
 % compounding a number of elementary transformations defined by the string
 % S.  The string S comprises a number of tokens of the form X(ARG) where
 % X is one of Tx, Ty or R.  ARG is the name of a variable in
-% main workspace or qJ where J is an integer in the range 1 to N that
+% MATLAB workspace or qJ where J is an integer in the range 1 to N that
 % selects the variable from the Jth column of the vector Q (1xN).
 %
 % For example:
@@ -22,7 +22,8 @@
 %
 % See also trchain, trot2, transl2.
 
-% Copyright (C) 1993-2014, by Peter I. Corke
+
+% Copyright (C) 1993-2017, by Peter I. Corke
 %
 % This file is part of The Robotics Toolbox for MATLAB (RTB).
 % 
@@ -43,6 +44,10 @@
 
 
 function T = trchain2(s, q)
+    
+    if nargin == 1
+        q = [];
+    end
     
     %s = 'R(q1)Tx(a1)R(q2)Tx(a3)R(q3)Tx(a3)';
     
@@ -69,7 +74,7 @@ function T = trchain2(s, q)
         else
             % or the workspace
             try
-                arg = evalin('base', token.arg);
+                arg = evalin('caller', token.arg);
             catch
                 error('RTB:trchain2:badarg', 'variable %s does not exist', token.arg);
             end
@@ -77,7 +82,7 @@ function T = trchain2(s, q)
         
         % now evaluate the element and update the transform chain
         switch token.op
-            case 'R'
+            case {'R', 'Rz'}
                 T = T * trot2(arg);
             case 'Tx'
                 T = T * transl2(arg, 0);

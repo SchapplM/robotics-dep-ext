@@ -1,4 +1,4 @@
-%ISVEC Test if argument is a vector
+%ISVEC Test if vector
 %
 % ISVEC(V) is true (1) if the argument V is a 3-vector, else false (0).
 %
@@ -6,14 +6,16 @@
 % either a row- or column-vector.  Otherwise false (0).
 %
 % Notes::
-% - differs from MATLAB builtin function ISVECTOR, the latter returns true
+% - Differs from MATLAB builtin function ISVECTOR, the latter returns true
 %   for the case of a scalar, ISVEC does not.
+% - Gives same result for row- or column-vector, ie. 3x1 or 1x3 gives true.
 %
 % See also ISHOMOG, ISROT.
 
 
 
-% Copyright (C) 1993-2014, by Peter I. Corke
+
+% Copyright (C) 1993-2017, by Peter I. Corke
 %
 % This file is part of The Robotics Toolbox for MATLAB (RTB).
 % 

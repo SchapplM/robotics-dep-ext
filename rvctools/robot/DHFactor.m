@@ -30,13 +30,13 @@
 %    >> r = eval( dh.command('myrobot') );
 %
 % Notes::
-% - Variables starting with q are assumed to be joint coordinates
+% - Variables starting with q are assumed to be joint coordinates.
 % - Variables starting with L are length constants.
 % - Length constants must be defined in the workspace before executing the 
 %   last line above.
-% - Implemented in Java
+% - Implemented in Java.
 % - Not all sequences can be converted to DH format, if conversion cannot be 
-%   achieved an error is generated.
+%   achieved an error is reported.
 %
 % Reference::
 % - A simple and systematic approach to assigning Denavit-Hartenberg parameters,
@@ -47,7 +47,8 @@
 % See also SerialLink.
 
 
-% Copyright (C) 1993-2014, by Peter I. Corke
+
+% Copyright (C) 1993-2017, by Peter I. Corke
 %
 % This file is part of The Robotics Toolbox for MATLAB (RTB).
 % 
