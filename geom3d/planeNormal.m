@@ -7,8 +7,9 @@ function n = planeNormal(plane)
 %   N : [dx dy dz]
 %   
 %   See also
-%   planes3d, createPlane
+%   geom3d, planes3d, createPlane
 %
+
 %   ---------
 %   author : David Legland 
 %   INRA - TPV URPOI - BIA IMASTE
@@ -16,7 +17,10 @@ function n = planeNormal(plane)
 %
 
 %   HISTORY
-
+%   15/04/2013 Extended to N-dim planes by Sven Holcombe
 
 % plane normal
-n = cross(plane(:,4:6), plane(:, 7:9), 2);
+outSz = size(plane);
+outSz(2) = 3;
+n = zeros(outSz);
+n(:) = crossProduct3d(plane(:,4:6,:), plane(:, 7:9,:));

@@ -49,8 +49,10 @@ function varargout = drawCylinder(cyl, varargin)
 %     view([60 30])
 %
 %   See Also:
-%   drawSphere, cylinderMesh, drawLine3d, surf
+%   cylinderMesh, drawEllipseCylinder, drawSphere, drawLine3d, surf
+%   intersectLineCylinder, cylinderSurfaceArea
 %
+
 %   ---------
 %   author : David Legland 
 %   INRA - TPV URPOI - BIA IMASTE
@@ -79,7 +81,7 @@ if iscell(cyl)
 end
 
 % default values
-N = 32;
+N = 128;
 closed = true;
 
 % check number of discretization steps
@@ -116,7 +118,7 @@ p2 = cyl(4:6);
 r = cyl(7);
 
 % compute orientation angle of cylinder
-[theta phi rho] = cart2sph2d(p2 - p1);
+[theta, phi, rho] = cart2sph2d(p2 - p1);
 dphi = linspace(0, 2*pi, N+1);
 
 % generate a cylinder oriented upwards

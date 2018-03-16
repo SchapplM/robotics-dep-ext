@@ -1,53 +1,51 @@
 function varargout = drawLine3d(lin, varargin)
-%DRAWLINE3D Draw a 3D line on the current axis
+%DRAWLINE3D Draw a 3D line clipped by the current axes
 %
-%   drawline3d(LINE);
-%   Draws the line LINE on the current axis, by clipping with the current
-%   axis. If line is not clipepd by the axis, function return -1.
+%   DRAWLINE3D(LINE) draws the line LINE on the current axis, by clipping 
+%   with the current axis.
 %
-%   drawLine3d(LINE, PARAM, VALUE)
-%   Accepts parameter/value pairs, like for plot function.
-%   Color of the line can also be given as a single parameter.
+%   DRAWLINE3D(LINE, PARAM, VALUE) accepts parameter/value pairs, like 
+%   for plot function. Color of the line can also be given as a single 
+%   parameter.
+%
+%   DRAWLINE3D(AX,...) plots into AX instead of GCA.
 %   
-%   H = drawLine3d(...)
-%   Returns a handle to the created graphic line object.
-%
+%   H = DRAWLINE3D(...) returns a handle to the created line object. 
+%   If the line is not clipped by the axis, function returns -1.
 %
 %   See also:
 %   lines3d, createLine3d, clipLine3d
 %
-%   ---------
-%   author : David Legland 
-%   INRA - TPV URPOI - BIA IMASTE
-%   created the 17/02/2005.
+% ---------
+% author : David Legland 
+% INRA - TPV URPOI - BIA IMASTE
+% created the 17/02/2005.
 %
 
-%   HISTORY
-%   30/10/2008 replace intersectPlaneLine by intersectLinePlane
-
-
-% ensure color is given as name-value pair
-if length(varargin)==1
-    varargin = {'color', varargin{1}};
-end
+% Parse and check inputs
+isLine3d = @(x) validateattributes(x,{'numeric'},...
+    {'nonempty','nonnan','real','finite','size',[nan,6]});
+defOpts.Color='b';
+[hAx, lin, varargin]=...
+    parseDrawInput(lin, isLine3d, 'line', defOpts, varargin{:});
 
 % extract limits of the bounding box
-lim = get(gca, 'xlim');
+lim = get(hAx, 'xlim');
 xmin = lim(1);
 xmax = lim(2);
-lim = get(gca, 'ylim');
+lim = get(hAx, 'ylim');
 ymin = lim(1);
 ymax = lim(2);
-lim = get(gca, 'zlim');
+lim = get(hAx, 'zlim');
 zmin = lim(1);
 zmax = lim(2);
 
-% clip the ine with the limits of the current axis
+% clip the line with the limits of the current axis
 edge = clipLine3d(lin, [xmin xmax ymin ymax zmin zmax]);
 
 % draw the clipped line
 if sum(isnan(edge))==0
-    h  = drawEdge3d(edge);
+    h  = drawEdge3d(hAx, edge);
     if ~isempty(varargin)
         set(h, varargin{:});
     end

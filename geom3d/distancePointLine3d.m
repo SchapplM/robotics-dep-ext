@@ -8,11 +8,12 @@ function d = distancePointLine3d(point, line)
 %   D     : (positive) scalar  
 %   
 %   See also:
-%   lines3d, distancePointLine, distancePointEdge3d, projPointOnLine3d
+%   lines3d, isPointOnLine3d, distancePointEdge3d, projPointOnLine3d,
+%   
 %
 %   References
 %   http://mathworld.wolfram.com/Point-LineDistance3-Dimensional.html
-%
+
 %   ---------
 %   author : David Legland 
 %   INRA - TPV URPOI - BIA IMASTE
@@ -26,5 +27,5 @@ function d = distancePointLine3d(point, line)
 
 % cf. Mathworld (distance point line 3d)  for formula
 d = bsxfun(@rdivide, vectorNorm3d( ...
-        vectorCross3d(line(:,4:6), bsxfun(@minus, line(:,1:3), point)) ), ...
+        crossProduct3d(line(:,4:6), bsxfun(@minus, line(:,1:3), point)) ), ...
         vectorNorm3d(line(:,4:6)));

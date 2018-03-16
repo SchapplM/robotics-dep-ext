@@ -1,4 +1,4 @@
-function [inter inside]= intersectRayPolygon3d(ray, poly)
+function [inter, inside]= intersectRayPolygon3d(ray, poly)
 %INTERSECTRAYPOLYGON3D Intersection point of a 3D ray and a 3D polygon
 %
 %   INTER = intersectRayPolygon3d(RAY, POLY)
@@ -35,8 +35,9 @@ function [inter inside]= intersectRayPolygon3d(ray, poly)
 %           1   2   3
 %
 %   See Also
-%   intersectLinePlane, intersectLinePolygon3d
+%   intersectRayPolygon, intersectLinePolygon3d, intersectLinePlane
 %
+
 % ------
 % Author: David Legland
 % e-mail: david.legland@grignon.inra.fr
@@ -50,11 +51,11 @@ plane   = createPlane(poly(1:3, :));
 inter   = intersectLinePlane(ray, plane);
 
 % project all points on reference plane
-pts2d   = projPointOnPlane(poly, plane);
-pInt2d  = projPointOnPlane(inter, plane);
+pts2d   = planePosition(projPointOnPlane(poly, plane), plane);
+pInt2d  = planePosition(projPointOnPlane(inter, plane), plane);
 
 % need to check polygon orientation
-inPoly  = xor(isPointInPolygon(pInt2d, pts2d), polygonArea(pInt2d) < 0);
+inPoly  = xor(isPointInPolygon(pInt2d, pts2d), polygonArea(pts2d) < 0);
 onRay   = linePosition3d(inter, ray) >= 0;
 inside  = inPoly & onRay;
 
