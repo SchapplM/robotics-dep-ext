@@ -6,6 +6,7 @@
 this_tb_path = fileparts( mfilename('fullpath') );
 addpath(this_tb_path);
 
+addpath(fullfile(this_tb_path, 'miscellaneous'));
 addpath(fullfile(this_tb_path, 'Advanced_Setpoints'));
 addpath(fullfile(this_tb_path, 'export_fig'));
 addpath(fullfile(this_tb_path, 'geom2d', 'geom2d'));
