@@ -17,3 +17,8 @@ addpath(fullfile(this_tb_path, 'geom3d'));
 addpath(fullfile(this_tb_path, 'meshes3d'));
 addpath(fullfile(this_tb_path, 'rvctools'));
 run(fullfile(this_tb_path, 'rvctools', 'startup_rvc.m'));
+% Ordner aus Pfad entfernen, die andere Skripte stören 
+% (`codegen` überschattet die Matlab-interne Funktion im Pfad)
+rmpath(fullfile(this_tb_path, 'rvctools', 'robot', 'demos'));
+rmpath(fullfile(this_tb_path, 'rvctools', 'robot', 'examples'));
+rmpath(fullfile(this_tb_path, 'rvctools', 'robot', 'mex'));
