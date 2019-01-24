@@ -6,6 +6,12 @@
 this_tb_path = fileparts( mfilename('fullpath') );
 addpath(this_tb_path);
 
+% Prüfe, ob die IMES-Robotik-Toolbox schon im Pfad ist.
+% imes-robotics sollte erst nach matlab-ext initialisiert werden, damit
+% Funktionen wie "eul2r" von dort genommen werden.
+if ~isempty(which('robotics_toolbox_path_init.m'))
+  warning('IMES-Robotik-Repo war schon im Pfad. Dadurch werden die Funktionen dort überlagert.');
+end
 addpath(fullfile(this_tb_path, 'miscellaneous'));
 addpath(fullfile(this_tb_path, 'Advanced_Setpoints'));
 addpath(fullfile(this_tb_path, 'export_fig'));

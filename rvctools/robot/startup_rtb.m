@@ -41,9 +41,9 @@ addpath( fullfile(tbpath, 'demos') );
 addpath( fullfile(tbpath, 'examples') );
 addpath( fullfile(tbpath, 'mex') );
 addpath( fullfile(tbpath, 'models') );
-addpath( fullfile(tbpath, 'data') );
+% addpath( fullfile(tbpath, 'data') );
 javaaddpath( fullfile(tbpath, 'java', 'DHFactor.jar') );
-addpath( fullfile(tbpath, 'interfaces', 'VREP') );
+% addpath( fullfile(tbpath, 'interfaces', 'VREP') );
 % add the contrib code to the path
 rvcpath = fileparts(tbpath);  % strip one folder off path
 p = fullfile(rvcpath, 'contrib');
