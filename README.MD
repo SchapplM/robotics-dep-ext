@@ -20,7 +20,7 @@ Hier erfolgt eine kurze Übersicht der im Repo enthaltenen Funktionen. Die Funkt
 * `Advanced_Setpoints`: [Feedforward Motion Control Toolbox von Paul Lambrechts](https://de.mathworks.com/matlabcentral/fileexchange/16352-advanced-setpoints-for-motion-systems). Enthält analytische Trapez-Profile.
 * `export_fig`: Dient zum schönen Exportieren von Matlab Figures in hoher Auflösung und als Vektorgrafik. Wird durch Matlab-interne Routinen nur unzureichend abgedeckt. Toolbox von Yair Altman [auf Github unter BSD-2-Clause Lizenz](https://github.com/altmany/export_fig).
 * `geom2d`, `geom3d`, `meshes3d`: Funktionen zum Zeichnen und Berechnen von zwei- und dreidimensionalen geometrischen Objekten. Toolbox von David Legland [auf Github unter BSD-2-Clause Lizenz](https://github.com/mattools/matGeom)
-* `rvctools`: Robotics Toolbox von Peter Corke. Enthält allgemeine Funktionen zur Berechnung von Robotern.
+* `rvctools`: [Robotics Toolbox von Peter Corke](http://petercorke.com/wordpress/toolboxes/robotics-toolbox). Enthält allgemeine Funktionen zur Berechnung von Robotern. Lizensiert unter GPLv3 Lizenz.
 
 ## Erweiterung
 
