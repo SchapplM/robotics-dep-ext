@@ -42,11 +42,12 @@ function [t,dd]=make4(varargin)
 %                          dd = [ ddq  cor1  cor2  dd ]
 %
 
-% Paul Lambrechts, TUE fac. WTB, last modified: June 15, 2004.
+%
+% Copyright 2004, Paul Lambrechts, The MathWorks, Inc.
 %
 
 % Checking validity of inputs
-if nargin < 5 | nargin > 8
+if nargin < 5 || nargin > 8
    help make4
    return
 else
@@ -71,8 +72,8 @@ else
    end
 end
 
-if length(p)==0 | length(v)==0 | length(a)==0 | length(j)==0 | length(d)==0 | ...
-   length(Ts)==0 | length(r)==0 | length(s)==0 
+if isempty(p) || isempty(v) || isempty(a) || isempty(j) || isempty(d) || ...
+   isempty(Ts) || isempty(r) || isempty(s) 
    disp('ERROR: insufficient input for trajectory calculation')
    return
 end
@@ -122,7 +123,7 @@ if Ts>0
    t2 = ceil(t2/Ts)*Ts;
    dd  = p/( 8*t1^4 + 16*t1^3*t2 + 10*t1^2*t2^2 + 2*t1*t2^3 );
 end
-if abs(t2)<tol t2=0; end % for continuous time case
+if abs(t2)<tol, t2=0; end % for continuous time case
 % velocity test
 if v < (2*dd*t1^3 + 3*dd*t1^2*t2 + dd*t1*t2^2)   % v bound violated ?
    t2 = ( t1^2/4 + v/d/t1 )^(1/2) - 3/2*t1 ;     % t2 with bound on velocity not violated
@@ -131,7 +132,7 @@ if v < (2*dd*t1^3 + 3*dd*t1^2*t2 + dd*t1*t2^2)   % v bound violated ?
       dd = v/( 2*t1^3 + 3*t1^2*t2 + t1*t2^2 );
    end
 end
-if abs(t2)<tol t2=0; end % for continuous time case
+if abs(t2)<tol, t2=0; end % for continuous time case
 % acceleration test
 if a < (dd*t1^2 + dd*t1*t2)  % a bound violated ?
    t2 = a/(d*t1) - t1 ;      % t2 with bound on acceleration not violated
@@ -140,7 +141,7 @@ if a < (dd*t1^2 + dd*t1*t2)  % a bound violated ?
       dd  = a/( t1^2 + t1*t2 );
    end
 end
-if abs(t2)<tol t2=0; end % for continuous time case
+if abs(t2)<tol, t2=0; end % for continuous time case
 d = dd;  % as t2 is now fixed, dd is the new bound on derivative of jerk
 
 % Calculation constant acceleration phase duration: t3
@@ -152,7 +153,7 @@ if Ts>0
    t3 = ceil(t3/Ts)*Ts;
    dd = p/( c1*t3^2 + c2*t3 + c3 );
 end
-if abs(t3)<tol t3=0; end % for continuous time case
+if abs(t3)<tol, t3=0; end % for continuous time case
 % velocity test
 if v < dd*(2*t1^3 + 3*t1^2*t2 + t1*t2^2 + t1^2*t3 + t1*t2*t3)  % v bound violated ?
    t3 = -(2*t1^3 + 3*t1^2*t2 + t1*t2^2 - v/d)/(t1^2 + t1*t2);  % t3, bound on velocity not violated
@@ -161,7 +162,7 @@ if v < dd*(2*t1^3 + 3*t1^2*t2 + t1*t2^2 + t1^2*t3 + t1*t2*t3)  % v bound violate
       dd = v/( 2*t1^3 + 3*t1^2*t2 + t1*t2^2 + t1^2*t3 + t1*t2*t3 );
    end
 end
-if abs(t3)<tol t3=0; end % for continuous time case
+if abs(t3)<tol, t3=0; end % for continuous time case
 d = dd;  % as t3 is now fixed, dd is the new bound on derivative of jerk
 
 % Calculation constant velocity phase duration: t4 
@@ -170,7 +171,7 @@ if Ts>0
    t4 = ceil(t4/Ts)*Ts;
    dd = p/( c1*t3^2 + c2*t3 + c3 + t4*(2*t1^3 + 3*t1^2*t2 + t1*t2^2 + t1^2*t3 + t1*t2*t3) ) ;
 end
-if abs(t4)<tol t4=0; end % for continuous time case
+if abs(t4)<tol, t4=0; end % for continuous time case
 
 % All time intervals are now calculated
 t=[t1 t2 t3 t4] ;

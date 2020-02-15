@@ -28,12 +28,11 @@ function [t,jd]=make3(varargin)
 %
 % In case of discrete time, jerk bound j is reduced to jd
 
-% Experimental version: no guarantees
 %
-% Paul Lambrechts, TUE fac. WTB, last modified: March 4, 2003.
+% Copyright 2004, Paul Lambrechts, The MathWorks, Inc.
 %
 
-if nargin < 4 | nargin > 5
+if nargin < 4 || nargin > 5
    help make3
    return
 else
@@ -48,7 +47,7 @@ else
    end
 end
 
-if length(p)==0 | length(v)==0 | length(a)==0 | length(j)==0 | length(Ts)==0  
+if isempty(p) || isempty(v) || isempty(a) || isempty(j) || isempty(Ts)  
    disp('ERROR: insufficient input for trajectory calculation')
    return
 end
@@ -86,7 +85,7 @@ if Ts>0
    t2 = ceil(t2/Ts)*Ts; 
    jd = p/( 2*t1^3 + 3*t1^2*t2 + t1*t2^2 ); 
 end
-if abs(t2)<tol t2=0; end % for continuous time case
+if abs(t2)<tol, t2=0; end % for continuous time case
 % velocity test
 if v < (jd*t1^2 + jd*t1*t2)   % v bound violated ?
    t2 = v/(j*t1) - t1 ;       % t2 with bound on velocity not violated
@@ -95,7 +94,7 @@ if v < (jd*t1^2 + jd*t1*t2)   % v bound violated ?
        jd = v/( t1^2 + t1*t2 ); 
    end
 end
-if abs(t2)<tol t2=0; end % for continuous time case
+if abs(t2)<tol, t2=0; end % for continuous time case
 j = jd;  % as t2 is now fixed, jd is the new bound on jerk
 
 % Calculation t3
@@ -104,7 +103,7 @@ if Ts>0
    t3 = ceil(t3/Ts)*Ts; 
    jd = p/( 2*t1^3 + 3*t1^2*t2 + t1*t2^2 + t1^2*t3 + t1*t2*t3 ); 
 end
-if abs(t3)<tol t3=0; end % for continuous time case
+if abs(t3)<tol, t3=0; end % for continuous time case
 
 % All time intervals are now calculated
 t=[ t1 t2 t3 ] ;

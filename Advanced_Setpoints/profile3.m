@@ -37,12 +37,11 @@ function [jj,tx,j,a,v,p,tt]=profile3(t,j,acc,plt)
 %
 %  Note: coinciding switching times are not removed 
 
-% Experimental version: no guarantees
 %
-% Paul Lambrechts, TUE fac. WTB, last modified: March 4, 2003.
+% Copyright 2004, Paul Lambrechts, The MathWorks, Inc.
 %
 
-if nargin < 3 | nargin > 4
+if nargin < 3 || nargin > 4
     help profile3
     return
 end
@@ -88,7 +87,7 @@ if max(abs( round(t/acc)-t/acc )) > 1e-12 % continuous
 
    disp('Calculating continuous time profiles')
    step = t(1)*acc;
-   tx=[0:step:1.2*tt(8)];
+   tx=0:step:1.2*tt(8);
    x=[];
    for i=0:step:1.2*tt(8)
        j=find(i<=jj(1,:));
@@ -110,13 +109,13 @@ else % discrete
    xv = xj;
    xp = xj;
    xj(1) = j;
-   tx=[0:Ts:1.2*tt(8)+Ts/2];
+   tx=0:Ts:1.2*tt(8)+Ts/2;
    for time=Ts:Ts:(1.2*tt(8)+Ts/2)
       i = find( (time + Ts/2) <= ttest ); i = i(1)-1;
       k = round(time/Ts);
-      if i==1 | i==7 
+      if i==1 || i==7 
           xj(k+1) =  j;
-      elseif i==3 | i==5 
+      elseif i==3 || i==5 
           xj(k+1) = -j;
       else
           xj(k+1) =  0;

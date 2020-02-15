@@ -1,6 +1,6 @@
 # Sammlung Externer Toolboxen
 
-Dieses Repo enthält eine Sammlung von externen Toolboxen und Funktionen für Matlab. Diese Funktionen werden häufig gebraucht und stammen von diversen Autoren außerhalb der Universität Hannover.
+Dieses Repo enthält eine Sammlung von externen Toolboxen und Funktionen für Matlab. Diese Funktionen werden häufig gebraucht und stammen von diversen Autoren außerhalb der Universität Hannover. Es gilt die jeweilige Lizenz des Unterordners.
 
 Moritz Schappler, schappler@imes.uni-hannover.de, 2018-03  
 (C) Institut für mechatronische Systeme, Universität Hannover
@@ -17,7 +17,7 @@ Die einzelnen Funktionen des Repos können über die Modultests aus dem Ordner `
 
 Hier erfolgt eine kurze Übersicht der im Repo enthaltenen Funktionen. Die Funktionsweise ist in den jeweiligen Funktionsdateien und Modultests erklärt.
 
-* `Advanced_Setpoints`: Feedforward Motion Control Toolbox von Paul Lambrechts. Enthält analytische Trapez-Profile
+* `Advanced_Setpoints`: [Feedforward Motion Control Toolbox von Paul Lambrechts](https://de.mathworks.com/matlabcentral/fileexchange/16352-advanced-setpoints-for-motion-systems). Enthält analytische Trapez-Profile.
 * `export_fig`: Dient zum schönen Exportieren von Matlab Figures in hoher Auflösung und als Vektorgrafik. Wird durch Matlab-interne Routinen nur unzureichend abgedeckt.
 * `geom2d`, `geom3d`: Funktionen zum Zeichnen und Berechnen von zwei- und dreidimensionalen geometrischen Objekten
 * `rvctools`: Robotics Toolbox von Peter Corke. Enthält allgemeine Funktionen zur Berechnung von Robotern.

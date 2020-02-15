@@ -1,70 +1,65 @@
-***************************************************************
-*  Preliminary release of Feedforward Motion Control Toolbox  *
-***************************************************************
-*              for MatLab Release 12 and up                   *
-***************************************************************
-
-Paul Lambrechts, June 15, 2004
-Eindhoven University of Technology
-Faculty of Mechanical Engineering, Control Systems Technology Group
-P.O. Box 513, 5600 MB Eindhoven, The Netherlands
-Telephone: +31 40 2472839
-Fax:       +31 40 2451418
-Email: P.F.Lambrechts@tue.nl
-***************************************************************
+*********************************************************************
+*             Advanced Setpoint Generation Toolbox                  *
+*********************************************************************
+*                                                                   *
+*  Copyright 2004, Paul Lambrechts, The MathWorks, Inc.             *
+*                                                                   *
+*  Originally created at, and published with permission of:         *
+*  Eindhoven University of Technology, Faculty of Mechanical        *
+*  Engineering, Control Systems Technology Group                    *
+*********************************************************************
 
 Properties:
 This toolbox allows planning of 2nd, 3d and 4th order trajectories 
-for single axis motion systems and using them in feedforward 
-control.
+for single axis motion systems in MATLAB(R) software.
+It also shows how to use use them in feedforward control.
 The planners are limited to symmetrical trajectories for 
 point-to-point motions.
 Discrete time implementation is fully supported, dealing with 
 quantization effects is indicated.
-Use of planners and feedforward controllers in Simulink is 
-supported.
-***************************************************************
+Use of planners and feedforward controllers in the Simulink(R) 
+environment is also supported.
+*********************************************************************
 
 Main Contents:
- make4.m      Matlab function to calculate timing for symmetrical 
+ make4.m      MATLAB(R) function to calculate timing for symmetrical 
               4th order profiles (analytical solution)
- profile4.m   Matlab function to calculate symmetrical 4th order 
+ profile4.m   MATLAB(R) function to calculate symmetrical 4th order 
               profiles from timing info 
- motion.mdl   Simulink library containing profile generators
+ motion.mdl   Simulink(R) library containing profile generators
               feedforward controllers and motion system models
              
 Auxiliary and additional:
- make2.m      Matlab function to calculate timing for symmetrical 
+ make2.m      MATLAB(R) function to calculate timing for symmetrical 
               2nd order profiles plus profiles themselves
- make3.m      Matlab function to calculate timing for symmetrical 
+ make3.m      MATLAB(R) function to calculate timing for symmetrical 
               3d order profiles
- make4_it.m   Matlab function to calculate timing for symmetrical 
+ make4_it.m   MATLAB(R) function to calculate timing for symmetrical 
               4th order profiles using iterations to solve 
               3d order polynomial (obsolete)
- profile3.m   Matlab function to calculate symmetrical 3d order 
+ profile3.m   MATLAB(R) function to calculate symmetrical 3d order 
               profiles from timing info 
 
- makeplant.m  Matlab script to define several parameters and 
+ makeplant.m  MATLAB(R) script to define several parameters and 
               state-space models for examples
               
- motion_example1.mdl   Simulink models giving examples of use
+ motion_example1.mdl   Simulink(R) models giving examples of use
  motion_example2.mdl   of the motion library
  motion_example3.mdl
  ref4_rt.mdl           Real-time implementation for single axis
  ref4_xy.mdl           Real-time implementation for X-Y moves
 
-***************************************************************
+*********************************************************************
  
 Installation and first use:
 Extract files to work directory or any directory specified in 
 matlabpath.
-At Matlab command prompt: enter 'motion' to open motion library
+At MATLAB(R) command prompt: enter 'motion' to open motion library
 and run examples.
 For more details and command line use: see help make# and 
 help profile#.
-***************************************************************
+*********************************************************************
 
-Disclaimer:
-This toolbox is provisional and experimental; hence no guarantees
-whatsoever on results.
-***************************************************************
+MATLAB and Simulink are registered trademarks of The MathWorks, Inc.
+See www.mathworks.com/trademarks for a list of additional trademarks.
+*********************************************************************

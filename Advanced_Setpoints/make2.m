@@ -50,12 +50,11 @@ function [t,ad,aa,tx,a,v,p,tt]=make2(varargin)
 %
 %  Note: coinciding switching times are not removed 
 
-% Experimental version: no guarantees
 %
-% Paul Lambrechts, TUE fac. WTB, last modified: March 4, 2003.
+% Copyright 2004, Paul Lambrechts, The MathWorks, Inc.
 %
 
-if nargin < 3 | nargin > 5
+if nargin < 3 || nargin > 5
    help make2
    return
 else
@@ -97,7 +96,7 @@ if Ts>0
    t2 = ceil(t2/Ts)*Ts; 
    ad = p/( t1^2 + t1*t2 );
 end
-if abs(t2)<1e-12 t2=0; end % for continuous time case
+if abs(t2)<1e-12, t2=0; end % for continuous time case
 
 % All time intervals are now calculated
 t=[ t1 t2 ] ;
@@ -139,11 +138,11 @@ end
 % Determine time grid for plotting
 if Ts==0
     Ts=t1/99.5;  % continuous time accuracy for profile calculations
-    while tt(4)/Ts > 5000 & Ts*2 < tt(2)
+    while tt(4)/Ts > 5000 && Ts*2 < tt(2)
         Ts=Ts*2;          % to prevent plot of more than 5000 points
     end
 else
-    Ts=Ts/10;   % discrete time accuracy for profile calculations
+   % Ts=Ts/10;   % discrete time accuracy for profile calculations
 end
 
 % Determine continuous or discrete
@@ -151,7 +150,7 @@ if max(abs( round(t/Ts)-t/Ts )) > 1e-12 % continuous
 
    disp('Calculating continuous time profiles')
    step = Ts;
-   tx=[0:step:1.2*tt(4)];
+   tx=(0:step:1.2*tt(4));
    x=[];
    for i=0:step:1.2*tt(4)
        j=find(i<=aa(1,:));
@@ -174,7 +173,7 @@ else % discrete
    xv = xa;
    xp = xa;
    xa(1) = a;
-   tx=[0:Ts:1.2*tt(4)+Ts/2];
+   tx=(0:Ts:1.2*tt(4)+Ts/2);
    for time=Ts:Ts:(1.2*tt(4)+Ts/2)
       i = find( (time + Ts/2) <= ttest ); i = i(1)-1;
       k = round(time/Ts);
@@ -200,7 +199,7 @@ subplot(312);plot(tx,v,'k','LineWidth',1.5);hold on;plot([0 0],[0 1]*max(v),'k--
 ylabel('v [m/s]');
 subplot(313);plot(tx,p,'k','LineWidth',1.5);hold on;plot([0 0],[0 1]*max(p),'k--',[1 1]*max(tt),[0 1]*max(p),'k--','LineWidth',1.5);grid on; axis([ [-0.01 1]*max(tx) [-0.1 1.1]*max(p)]);
 xlabel('time [s]');ylabel('x [m]');
-set(1,'position',[700 400 500 500])
+%set(1,'position',[700 400 500 500])
 set(1,'paperposition',[0 0 5 5])
 
 return
