@@ -1,54 +1,51 @@
 function A = allcomb(varargin)
+
 % ALLCOMB - All combinations
 %    B = ALLCOMB(A1,A2,A3,...,AN) returns all combinations of the elements
-%    in A1, A2, ..., and AN. B is P-by-N matrix is which P is the product
-%    of the number of elements of the N inputs.
-%    Empty inputs yields an empty matrix B of size 0-by-N. Note that
-%    previous versions (1.x) simply ignored empty inputs.
+%    in the arrays A1, A2, ..., and AN. B is P-by-N matrix where P is the product
+%    of the number of elements of the N inputs. 
+%    This functionality is also known as the Cartesian Product. The
+%    arguments can be numerical and/or characters, or they can be cell arrays.
 %
-%    Example:
-%       allcomb([1 3 5],[-3 8],[0 1]) 
-%         1  -3   0
-%         1  -3   1
-%         1   8   0
-%         ...
-%         5  -3   1
-%         5   8   1
+%    Examples:
+%       allcomb([1 3 5],[-3 8],[0 1]) % numerical input:
+%       % -> [ 1  -3   0
+%       %      1  -3   1
+%       %      1   8   0
+%       %        ...
+%       %      5  -3   1
+%       %      5   8   1 ] ; % a 12-by-3 array
 %
-%       % Inputs can be character arrays as well:
-%       allcomb('abc','XY')
-%         aX
-%         aY
-%         bX
-%         bY
-%         cX
-%         cY
+%       allcomb('abc','XY') % character arrays
+%       % -> [ aX ; aY ; bX ; bY ; cX ; cY] % a 6-by-2 character array
 %
-%       % or combined (output will be a character array)
-%       allcomb('ab',[65 66])
-%         aA
-%         aB
-%         bA
-%         bB
+%       allcomb('xy',[65 66]) % a combination -> character output
+%       % -> ['xA' ; 'xB' ; 'yA' ; 'yB'] % a 4-by-2 character array
 %
-%    ALLCOMB(A1,..AN,'matlab') causes the first column to change fastest.
-%    This is more consistent with matlab indexing. Example:
-%    allcomb(1:2,3:4,5:6,'matlab') %->
-%      1   3   5
-%      2   3   5
-%      1   4   5
-%      ...
-%      2   4   6
+%       allcomb({'hello','Bye'},{'Joe', 10:12},{99999 []}) % all cell arrays
+%       % -> {  'hello'  'Joe'        [99999]
+%       %       'hello'  'Joe'             []
+%       %       'hello'  [1x3 double] [99999]
+%       %       'hello'  [1x3 double]      []
+%       %       'Bye'    'Joe'        [99999]
+%       %       'Bye'    'Joe'             []
+%       %       'Bye'    [1x3 double] [99999]
+%       %       'Bye'    [1x3 double]      [] } ; % a 8-by-3 cell array
 %
-%    This functionality is also known as the cartesian product.
+%    ALLCOMB(..., 'matlab') causes the first column to change fastest which
+%    is consistent with matlab indexing. Example: 
+%      allcomb(1:2,3:4,5:6,'matlab') 
+%      % -> [ 1 3 5 ; 1 4 5 ; 1 3 6 ; ... ; 2 4 6 ]
 %
+%    If one of the N arguments is empty, ALLCOMB returns a 0-by-N empty array.
+%    
 %    See also NCHOOSEK, PERMS, NDGRID
-%    and COMBN, KTHCOMBN (Matlab Central FEX)
+%         and NCHOOSE, COMBN, KTHCOMBN (Matlab Central FEX)
 
-% for Matlab R13+
-% version 2.2 (jan 2012)
+% Tested in Matlab R2015a and up
+% version 4.2 (apr 2018)
 % (c) Jos van der Geest
-% email: jos@jasen.nl
+% email: samelinoa@gmail.com
 
 % History
 % 1.1 (feb 2006), removed minor bug when entering empty cell arrays;
@@ -61,41 +58,56 @@ function A = allcomb(varargin)
 %      argument (specifying the order) to crash.
 % 2.2 (jan 2012). removed a superfluous line of code (ischar(..))
 % 3.0 (may 2012) removed check for doubles so character arrays are accepted
+% 4.0 (feb 2014) added support for cell arrays
+% 4.1 (feb 2016) fixed error for cell array input with last argument being
+%     'matlab'. Thanks to Richard for pointing this out.
+% 4.2 (apr 2018) fixed some grammar mistakes in the help and comments
 
-error(nargchk(1,Inf,nargin)) ;
+narginchk(1,Inf) ;
+NC = nargin ;
 
-% check for empty inputs
-q = ~cellfun('isempty',varargin) ;
-if any(~q),
-    warning('ALLCOMB:EmptyInput','Empty inputs result in an empty output.') ;
-    A = zeros(0,nargin) ;
+% check if we should flip the order
+if ischar(varargin{end}) && (strcmpi(varargin{end}, 'matlab') || strcmpi(varargin{end}, 'john'))
+    % based on a suggestion by JD on the FEX
+    NC = NC-1 ;
+    ii = 1:NC ; % now first argument will change fastest
 else
-    
-    ni = sum(q) ;
-    
-    argn = varargin{end} ;
+    % default: enter arguments backwards, so last one (AN) is changing fastest
+    ii = NC:-1:1 ;
+end
 
-    if ischar(argn) && (strcmpi(argn,'matlab') || strcmpi(argn,'john')),
-        % based on a suggestion by JD on the FEX
-        ni = ni-1 ;
-        ii = 1:ni ;
-        q(end) = 0 ;
-    else
-        % enter arguments backwards, so last one (AN) is changing fastest
-        ii = ni:-1:1 ;
-    end
-    
-    if ni==0,
-        A = [] ;
-    else
-        args = varargin(q) ;
-        if ni==1,
-            A = args{1}(:) ;
-        else
-            % flip using ii if last column is changing fastest
-            [A{ii}] = ndgrid(args{ii}) ;
-            % concatenate
-            A = reshape(cat(ni+1,A{:}),[],ni) ;
+args = varargin(1:NC) ;
+
+if any(cellfun('isempty', args)) % check for empty inputs
+    warning('ALLCOMB:EmptyInput','One of more empty inputs result in an empty output.') ;
+    A = zeros(0, NC) ;
+elseif NC == 0 % no inputs
+    A = zeros(0,0) ; 
+elseif NC == 1 % a single input, nothing to combine
+    A = args{1}(:) ; 
+else
+    isCellInput = cellfun(@iscell, args) ;
+    if any(isCellInput)
+        if ~all(isCellInput)
+            error('ALLCOMB:InvalidCellInput', ...
+                'For cell input, all arguments should be cell arrays.') ;
         end
+        % for cell input, we use to indices to get all combinations
+        ix = cellfun(@(c) 1:numel(c), args, 'un', 0) ;
+        
+        % flip using ii if last column is changing fastest
+        [ix{ii}] = ndgrid(ix{ii}) ;
+        
+        A = cell(numel(ix{1}), NC) ; % pre-allocate the output
+        for k = 1:NC
+            % combine
+            A(:,k) = reshape(args{k}(ix{k}), [], 1) ;
+        end
+    else
+        % non-cell input, assuming all numerical values or strings
+        % flip using ii if last column is changing fastest
+        [A{ii}] = ndgrid(args{ii}) ;
+        % concatenate
+        A = reshape(cat(NC+1,A{:}), [], NC) ;
     end
 end

@@ -1,0 +1,2 @@
+The function is publicly available from The Mathworks and can be regarded as part of Matlab Software
+http://de.mathworks.com/help/matlab/ref/xmlread.html
