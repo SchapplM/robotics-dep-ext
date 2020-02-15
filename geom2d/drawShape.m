@@ -1,5 +1,5 @@
 function varargout = drawShape(type, param, varargin)
-%DRAWSHAPE Draw various types of shapes (circles, polygons...)
+%DRAWSHAPE Draw various types of shapes (circles, polygons...).
 %
 %   drawShape(TYPE, PARAM)
 %   Draw the shape of type TYPE, specified by given parameter PARAM. TYPE
@@ -53,9 +53,9 @@ end
 shape = cell(1,length(type));
 for i = 1:length(type)    
     if strcmpi(type{i}, 'circle')
-        shape{i} = circleAsPolygon(param{i}, 128);
+        shape{i} = circleToPolygon(param{i}, 128);
     elseif strcmpi(type{i}, 'rect')
-        shape{i} = rectAsPolygon(param{i});
+        shape{i} = rectToPolygon(param{i});
     elseif strcmpi(type{i}, 'polygon')
         shape{i} = param{i};        
     end

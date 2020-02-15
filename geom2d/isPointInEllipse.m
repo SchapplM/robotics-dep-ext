@@ -1,5 +1,5 @@
 function b = isPointInEllipse(point, ellipse, varargin)
-%ISPOINTINELLIPSE Check if a point is located inside a given ellipse
+%ISPOINTINELLIPSE Check if a point is located inside a given ellipse.
 %
 %   B = isPointInEllipse(POINT, ELLIPSE) 
 %   Returns true if point is located inside the given ellipse.
@@ -22,8 +22,9 @@ function b = isPointInEllipse(point, ellipse, varargin)
 %       1
 %
 %   See also:
-%   ellipses2d, isPointInCircle
+%     ellipses2d, isPointInCircle
 %
+
 %   ---------
 %   author : David Legland 
 %   INRA - TPV URPOI - BIA IMASTE

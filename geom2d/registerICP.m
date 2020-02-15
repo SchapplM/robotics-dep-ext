@@ -1,5 +1,5 @@
 function [trans, points] = registerICP(points, target, varargin)
-%REGISTERICP Fit affine transform by Iterative Closest Point algorithm
+%REGISTERICP Fit affine transform by Iterative Closest Point algorithm.
 %
 %   TRANS = registerICP(POINTS, TARGET)
 %   Computes the affine transform that maps the shape defines by POINTS
@@ -17,12 +17,12 @@ function [trans, points] = registerICP(points, target, varargin)
 %   registerICP
 %
 %   See also
-%     tansforms2d, fitAffineTransform2d
+%     transforms2d, fitAffineTransform2d, registerPoints3dAffine
 %
  
 % ------
 % Author: David Legland
-% e-mail: david.legland@nantes.inra.fr
+% e-mail: david.legland@inra.fr
 % Created: 2015-02-24,    using Matlab 8.4.0.150421 (R2014b)
 % Copyright 2015 INRA - Cepia Software Platform.
 

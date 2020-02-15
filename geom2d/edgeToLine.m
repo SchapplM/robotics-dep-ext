@@ -1,8 +1,10 @@
 function line = edgeToLine(edge)
-%EDGETOLINE Convert an edge to a straight line
+%EDGETOLINE Convert an edge to a straight line.
 %
 %   LINE = edgeToLine(EDGE);
-%   Returns the line containing the edge EDGE.
+%   Returns the straight line containing the edge EDGE.
+%   EDGE is represented as [X1 Y1  X2 Y2]
+%   LINE is represented as [X0 Y0  DX DY]
 %
 %   Example
 %       edge = [2 3 4 5];
@@ -12,11 +14,12 @@ function line = edgeToLine(edge)
 %       drawEdge(edge, 'linewidth', 2)
 %   
 %   See also
-%   edges2d, lines2d
+%   edges2d, lines2d, lineToEdge
 %
+
 % ------
 % Author: David Legland
-% e-mail: david.legland@grignon.inra.fr
+% e-mail: david.legland@inra.fr
 % Created: 2009-07-23,    using Matlab 7.7.0.471 (R2008b)
 % Copyright 2009 INRA - Cepia Software Platform.
 

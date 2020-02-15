@@ -1,5 +1,5 @@
 function varargout = revolutionSurface(varargin)
-%REVOLUTIONSURFACE Create a surface of revolution from a planar curve
+%REVOLUTIONSURFACE Create a surface of revolution from a planar curve.
 %
 %   usage 
 %   [X Y Z] = revolutionSurface(C1, C2, N);
@@ -63,8 +63,8 @@ function varargout = revolutionSurface(varargin)
 % default values
 
 % use revolution using the full unit circle, decomposed into 24 angular
-% segments (thus, some vertices correspond to particular angles 30°,
-% 45°...)
+% segments (thus, some vertices correspond to particular angles 30Â°,
+% 45Â°...)
 theta = linspace(0, 2*pi, 25);
 
 % use planar vertical axis as default revolution axis

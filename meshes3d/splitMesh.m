@@ -1,5 +1,5 @@
 function meshes = splitMesh(vertices, faces, varargin)
-%SPLITMESH Return the connected components of a mesh
+%SPLITMESH Return the connected components of a mesh.
 %
 %   MESHES = splitMesh(VERTICES, FACES) returns the connected components of
 %   the mesh defined by vertices and faces as a struct array with the  
@@ -9,7 +9,10 @@ function meshes = splitMesh(vertices, faces, varargin)
 %   possible
 %   
 %   ... = splitMesh(..., 'mostVertices') returns only the component with
-%   the most vertices
+%   the most vertices. Other options are 'all' (default),
+%   'maxBoundingBox' that returns the component with the largest bounding 
+%   box, and 'maxVolume' returns the component with the largest volume.
+%
 %
 %   Example
 %     [v1, f1] = boxToMesh([1 0 -1 0 -1 0]);
@@ -45,9 +48,10 @@ if isstruct(vertices)
 end
 
 parser = inputParser;
-validStrings = {'all','mostVertices'};
+validStrings = {'all','mostVertices','maxBoundingBox','maxVolume'};
 addOptional(parser,'components','all',@(x) any(validatestring(x, validStrings)));
 parse(parser,varargin{:});
+outputComp = validatestring(parser.Results.components, validStrings);
 
 % algorithm
 CC = connected_components(faces);
@@ -59,15 +63,21 @@ for cc=b
 end
 
 % output parsing
-switch parser.Results.components
+switch outputComp
     case 'mostVertices'
         meshes=meshes(end);
+    case 'maxBoundingBox'
+        [~,sortingIndices] = sort(arrayfun(@(x) box3dVolume(boundingBox3d(x.vertices)), meshes));
+        meshes = meshes(sortingIndices(end));
+    case 'maxVolume'
+        [~,sortingIndices] = sort(arrayfun(@(x) meshVolume(x.vertices, x.faces), meshes));
+        meshes = meshes(sortingIndices(end));
 end
 
 end
 
 
-%% Locals functions are part of the gptoolbox by Alec Jacobson
+%% Local functions are part of the gptoolbox by Alec Jacobson
 function C = connected_components(F)
 % CONNECTED_COMPONENTS Determine the connected components of a mesh
 % described by the simplex list F. Components are determined with respect
@@ -138,4 +148,3 @@ S = numel(r)-1;
 C = cumsum(full(sparse(1,r(1:end-1),1,1,size(G,1))));
 C(p) = C;
 end
-

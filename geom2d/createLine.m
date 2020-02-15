@@ -1,5 +1,5 @@
 function line = createLine(varargin)
-%CREATELINE Create a straight line from 2 points, or from other inputs
+%CREATELINE Create a straight line from 2 points, or from other inputs.
 %
 %   Line is represented in a parametric form : [x0 y0 dx dy]
 %   x = x0 + t*dx
@@ -20,6 +20,9 @@ function line = createLine(varargin)
 %   
 %   L = createLine(THETA);
 %   Create a polar line originated at (0,0) and with angle THETA.
+%
+%   L = createLine(p, THETA);
+%   Create a polar line originated at p and with angle THETA.
 %
 %   L = createLine(RHO, THETA);
 %   Create a polar line with normal theta, and with min distance to origin
@@ -94,10 +97,15 @@ elseif length(varargin)==2
     % - 2 points, then 2 arrays of 1*2 double.
     v1 = varargin{1};
     v2 = varargin{2};
-    if size(v1, 2)==1
+    if size(v1, 2)==2 && size(v2, 2)==1
+        % first param is point, and second param is angle of line
+        line = [v1(:,1), v1(:,2) cos(v2) sin(v2)];
+    elseif size(v1, 2)==1
         % first param is angle of line, and second param is signed distance
         % to origin.
         line = [v1.*cos(v2) v1.*sin(v2) -sin(v2) cos(v2)];
+    elseif size(v1, 2)==3 || size(v2, 2)==3
+        error('The 1st or 2nd input argument has 3 columns. You may want to try createLine3d.');
     else
         % first input parameter is first point, and second input is the
         % second point.

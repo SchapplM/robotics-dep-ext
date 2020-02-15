@@ -1,5 +1,5 @@
 function [axis, theta] = rotation3dAxisAndAngle(mat)
-%ROTATION3DAXISANDANGLE Determine axis and angle of a 3D rotation matrix
+%ROTATION3DAXISANDANGLE Determine axis and angle of a 3D rotation matrix.
 %
 %   [AXIS, ANGLE] = rotation3dAxisAndAngle(MAT)
 %   Where MAT is a 4-by-4 matrix representing a rotation, computes the
@@ -58,7 +58,7 @@ end
 
 % try to get a point on the line
 % seems to work, but not sure about stability
-[V, D] = eig(mat-eye(4)); %#ok<NASGU>
+[V, D] = eig(mat-eye(4)); %#ok<ASGLU>
 origin = V(1:3,4)'/V(4, 4);
 
 % create line corresponding to rotation axis

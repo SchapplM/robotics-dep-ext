@@ -1,5 +1,5 @@
 function len = edgeLength(varargin)
-%EDGELENGTH Return length of an edge
+%EDGELENGTH Return length of an edge.
 %
 %   L = edgeLength(EDGE);  
 %   Returns the length of an edge, with parametric representation:
@@ -22,8 +22,6 @@ function len = edgeLength(varargin)
 %   HISTORY
 %   15/04/2005 changes definition for edge, uses [x1 y1 x2 y2] instead of
 %       [x0 y0 dx dy].
-
-%   TODO : specify norm (euclidian, taxi, ...).
 
 if nargin == 1
     % input is an edge [X1 Y1 X2 Y2]

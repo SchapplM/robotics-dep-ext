@@ -1,5 +1,5 @@
 function varargout = drawFaceNormals(varargin)
-%DRAWFACENORMALS Draw normal vector of each face in a mesh
+%DRAWFACENORMALS Draw normal vector of each face in a mesh.
 %
 %   drawFaceNormals(V, E, F)
 %   Compute and draw the face normals of the mesh defined by vertices V,
@@ -27,11 +27,11 @@ function varargout = drawFaceNormals(varargin)
 % Copyright 2010 INRA - Cepia Software Platform.
 
 % extract vertices and faces
-[vertices, faces] = parseMeshData(varargin{:});
+mesh = parseMeshData(varargin{:});
 
 % compute vector data
-c = meshFaceCentroids(vertices, faces);
-n = meshFaceNormals(vertices, faces);
+c = meshFaceCentroids(mesh);
+n = meshFaceNormals(mesh);
 
 % display an arrow for each normal
 h = quiver3(c(:,1), c(:,2), c(:,3), n(:,1), n(:,2), n(:,3));

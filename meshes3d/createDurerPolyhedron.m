@@ -1,5 +1,5 @@
 function varargout = createDurerPolyhedron(varargin)
-%CREATEDURERPOLYHEDRON  Create a mesh representing Durer's polyhedron 
+%CREATEDURERPOLYHEDRON  Create a mesh representing Durer's polyhedron .
 %
 %   [V, F] = createDurerPolyhedron
 %   [V, E, F] = createDurerPolyhedron
@@ -35,7 +35,7 @@ function varargout = createDurerPolyhedron(varargin)
 %
 %   References
 %   http://mathworld.wolfram.com/DuerersSolid.html
-%   http://en.wikipedia.org/wiki/Dürer_graph
+%   http://en.wikipedia.org/wiki/DÃ¼rer_graph
 
 % ------
 % Author: David Legland
