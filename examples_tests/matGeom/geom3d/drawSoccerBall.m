@@ -12,8 +12,8 @@ function drawSoccerBall
 %   * compute intersections of planes, spheres, lines
 %   * draw spherical patches
 %
-%   Usage:
-%   drawSoccerBall
+%   Example
+%     drawSoccerBall
 %
 %   See Also
 %     demoDrawTubularMesh, demoRevolutionSurface
@@ -54,7 +54,7 @@ for f = 1:length(faces)
     Nvf = length(faceVertices);
     
     % compute centroid of face vertices
-    % (See also function faceCentroids)
+    % (See also function meshFaceCentroids)
     faceCenter = mean(vertices(faceVertices, :), 1);
     
     % color of the current face (black for pentagons, white for heaxagons)
