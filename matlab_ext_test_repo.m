@@ -9,15 +9,15 @@
 %% geom2d
 clc;clear;close all;
 this_repo_path = fullfile(fileparts(which('matlab_ext_test_repo.m')));
-addpath(fullfile(this_repo_path,'examples_tests', 'geom2d','triangle'));
+addpath(fullfile(this_repo_path,'examples_tests', 'matGeom', 'geom2d','triangle'));
 compTriangle
 demoNapoleon
-triangleDemo
+% triangleDemo % TODO: Funktioniert nicht?
 
 %% geom3d
 clc;clear;close all;
 this_repo_path = fullfile(fileparts(which('matlab_ext_test_repo.m')));
-addpath(fullfile(this_repo_path, 'examples_tests', 'geom3d-demos'));
+addpath(fullfile(this_repo_path, 'examples_tests', 'matGeom', 'geom3d'));
 demoDrawLine3d
 demoDrawPlane3d
 demoDrawTubularMesh
@@ -29,7 +29,7 @@ drawSoccerBall
 %% meshes3d
 clc;clear;close all;
 this_repo_path = fullfile(fileparts(which('matlab_ext_test_repo.m')));
-addpath(fullfile(this_repo_path, 'examples_tests', 'meshes3d-demos'));
+addpath(fullfile(this_repo_path, 'examples_tests', 'matGeom', 'meshes3d'));
 
 % createTrefoilKnot
 demoClipMeshVertices

@@ -15,10 +15,13 @@ end
 addpath(fullfile(this_tb_path, 'miscellaneous'));
 addpath(fullfile(this_tb_path, 'Advanced_Setpoints'));
 addpath(fullfile(this_tb_path, 'export_fig'));
-addpath(fullfile(this_tb_path, 'geom2d'));
-addpath(fullfile(this_tb_path, 'geom3d'));
-addpath(fullfile(this_tb_path, 'meshes3d'));
+addpath(fullfile(this_tb_path, 'matGeom', 'geom2d'));
+addpath(fullfile(this_tb_path, 'matGeom', 'geom3d'));
+addpath(fullfile(this_tb_path, 'matGeom', 'meshes3d'));
+addpath(fullfile(this_tb_path, 'matGeom', 'polygons2d'));
+addpath(fullfile(this_tb_path, 'matGeom', 'utils'));
 addpath(fullfile(this_tb_path, 'rvctools'));
+
 run(fullfile(this_tb_path, 'rvctools', 'startup_rvc.m'));
 % Ordner aus Pfad entfernen, die andere Skripte stören 
 % (`codegen` überschattet die Matlab-interne Funktion im Pfad)
