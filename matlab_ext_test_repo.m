@@ -22,7 +22,7 @@ demoDrawLine3d
 demoDrawPlane3d
 demoDrawTubularMesh
 demoGeom3d
-demoInertiaEllipsoid
+demoEquivalentEllipsoid
 demoRevolutionSurface
 drawSoccerBall
 
