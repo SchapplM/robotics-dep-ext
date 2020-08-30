@@ -77,7 +77,7 @@ function REP = MOPSO(params,MultiObj)
     
     % Plotting and verbose
     if(size(POS_fit,2)==2)
-        h_fig = figure(1);
+        h_fig = change_current_figure(1);clf;
         h_par = plot(POS_fit(:,1),POS_fit(:,2),'or'); hold on;
         h_rep = plot(REP.pos_fit(:,1),REP.pos_fit(:,2),'ok'); hold on;
         try
@@ -89,7 +89,7 @@ function REP = MOPSO(params,MultiObj)
         drawnow;
     end
     if(size(POS_fit,2)==3)
-        h_fig = figure(1);
+        h_fig = change_current_figure(1);clf;
         h_par = plot3(POS_fit(:,1),POS_fit(:,2),POS_fit(:,3),'or'); hold on;
         h_rep = plot3(REP.pos_fit(:,1),REP.pos_fit(:,2),REP.pos_fit(:,3),'ok'); hold on;
         try
@@ -145,7 +145,7 @@ function REP = MOPSO(params,MultiObj)
         
         % Plotting and verbose
         if(size(POS_fit,2)==2)
-            figure(h_fig); delete(h_par); delete(h_rep);
+            change_current_figure(h_fig); delete(h_par); delete(h_rep);
             h_par = plot(POS_fit(:,1),POS_fit(:,2),'or'); hold on;
             h_rep = plot(REP.pos_fit(:,1),REP.pos_fit(:,2),'ok'); hold on;
             try
@@ -162,7 +162,7 @@ function REP = MOPSO(params,MultiObj)
             axis square;
         end
         if(size(POS_fit,2)==3)
-            figure(h_fig); delete(h_par); delete(h_rep); 
+            change_current_figure(h_fig); delete(h_par); delete(h_rep); 
             h_par = plot3(POS_fit(:,1),POS_fit(:,2),POS_fit(:,3),'or'); hold on;
             h_rep = plot3(REP.pos_fit(:,1),REP.pos_fit(:,2),REP.pos_fit(:,3),'ok'); hold on;
             try
