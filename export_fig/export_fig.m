@@ -312,19 +312,6 @@ function [imageData, alpha] = export_fig(varargin) %#ok<*STRCL1>
     drawnow;
     pause(0.05);  % this solves timing issues with Java Swing's EDT (http://undocumentedmatlab.com/blog/solving-a-matlab-hang-problem)
 
-    % Display promo (just once!)
-    persistent promo
-    if isempty(promo) && ~isdeployed
-        website = 'https://UndocumentedMatlab.com';
-        link = ['<a href="' website];
-        msg = 'If you need expert assistance with Matlab, please consider my professional consulting/training services';
-        msg = [msg ' (' website ')'];
-        msg = regexprep(msg,website,[link '">$0</a>']);
-        msg = regexprep(msg,{'consulting','training'},[link '/$0">$0</a>']);
-        %warning('export_fig:promo',msg);
-        disp(['[' 8 msg ']' 8]);
-        promo = true;
-    end
 
     % Parse the input arguments
     fig = get(0, 'CurrentFigure');
