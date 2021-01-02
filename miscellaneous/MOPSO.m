@@ -20,16 +20,19 @@
 %           * MultiObj.var_min: Vector that indicates the minimum values  %
 %                               of the search space in each dimension.    %
 %           * MultiObj.var_max: Same than 'var_min' with the maxima.      %
+%           * MultiObj.P0:      Initial population (optional)             %
 % ----------------------------------------------------------------------- %
 %   For an example of use, run 'example.m'.                               %
 % ----------------------------------------------------------------------- %
 %   Author:  Victor Martinez Cagigal                                      %
 %   Date:    17/03/2017                                                   %
-%   E-mail:  vicmarcag (at) gmail (dot) com                              %
+%   E-mail:  vicmarcag (at) gmail (dot) com                               %
 %   Version: 1.1                                                          %
 %   Log:                                                                  %
 %           - 1.0:  Initial version without mutation [1] (15/03/2017).    %
 %           - 1.1:  Crowding and mutation are implemented [2].            %
+%   Changes against original version (by Moritz Schappler):               %
+%           - initial population
 % ----------------------------------------------------------------------- %
 %   References:                                                           %
 %    [1]Coello, C. A. C., Pulido, G. T., & Lechuga, M. S. (2004). Handling%
@@ -59,7 +62,15 @@ function REP = MOPSO(params,MultiObj)
     var_max = MultiObj.var_max(:);
     
     % Initialization
-    POS = repmat((var_max-var_min)',Np,1).*rand(Np,nVar) + repmat(var_min',Np,1);
+    if isfield(MultiObj, 'P0')
+      if ~all(size(MultiObj.P0) == [Np,nVar])
+        error('Initial population has to be %dx%d, not %dx%d.', Np, nVar, ...
+          size(MultiObj.P0,1), size(MultiObj.P0,2));
+      end
+      POS = MultiObj.P0;
+    else % random initial population
+      POS = repmat((var_max-var_min)',Np,1).*rand(Np,nVar) + repmat(var_min',Np,1);
+    end
     VEL = zeros(Np,nVar);
     POS_fit  = fun(POS);
     if size(POS,1) ~= size(POS_fit,1)
