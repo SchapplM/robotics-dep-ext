@@ -21,6 +21,8 @@
 %                               of the search space in each dimension.    %
 %           * MultiObj.var_max: Same than 'var_min' with the maxima.      %
 %           * MultiObj.P0:      Initial population (optional)             %
+%           * MultiObj.OutputFcn:                                         %
+%                     Function called after each generation (optional)    %
 % ----------------------------------------------------------------------- %
 %   For an example of use, run 'example.m'.                               %
 % ----------------------------------------------------------------------- %
@@ -32,7 +34,8 @@
 %           - 1.0:  Initial version without mutation [1] (15/03/2017).    %
 %           - 1.1:  Crowding and mutation are implemented [2].            %
 %   Changes against original version (by Moritz Schappler):               %
-%           - initial population
+%           - initial population                                          %
+%           - output function                                             %
 % ----------------------------------------------------------------------- %
 %   References:                                                           %
 %    [1]Coello, C. A. C., Pulido, G. T., & Lechuga, M. S. (2004). Handling%
@@ -191,6 +194,12 @@ function REP = MOPSO(params,MultiObj)
             axis square;
         end
         display(['Generation #' num2str(gen) ' - Repository size: ' num2str(size(REP.pos,1))]);
+        % call output function
+        if isfield(MultiObj, 'OutputFcn')
+          for i = 1:length(MultiObj.OutputFcn)
+            stopCondition = stopCondition | feval(MultiObj.OutputFcn{i},REP);
+          end
+        end
         
         % Update generation and check for termination
         gen = gen + 1;
