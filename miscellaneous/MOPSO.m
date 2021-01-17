@@ -23,6 +23,7 @@
 %           * MultiObj.P0:      Initial population (optional)             %
 %           * MultiObj.OutputFcn:                                         %
 %                     Function called after each generation (optional)    %
+%                     Takes struct with fields REP,POS,POS_fit (see code) %
 % ----------------------------------------------------------------------- %
 %   For an example of use, run 'example.m'.                               %
 % ----------------------------------------------------------------------- %
@@ -197,7 +198,8 @@ function REP = MOPSO(params,MultiObj)
         % call output function
         if isfield(MultiObj, 'OutputFcn')
           for i = 1:length(MultiObj.OutputFcn)
-            stopCondition = stopCondition | feval(MultiObj.OutputFcn{i},REP);
+            stopCondition = stopCondition | feval(MultiObj.OutputFcn{i},...
+              struct('POS', POS, 'POS_fit', POS_fit, 'REP', REP));
           end
         end
         
