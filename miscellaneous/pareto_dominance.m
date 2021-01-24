@@ -18,6 +18,7 @@
 
 function dom_vector = pareto_dominance(fitness)
   Np = size(fitness,1);
+  if Np == 1, dom_vector = false; return; end % code below does not work for Np=1
   dom_vector = false(Np,1);
   all_perm = nchoosek(1:Np,2);    % Possible permutations
   all_perm = [all_perm; [all_perm(:,2) all_perm(:,1)]]; % also check other way around
