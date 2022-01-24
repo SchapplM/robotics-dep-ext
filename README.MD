@@ -21,6 +21,7 @@ Hier erfolgt eine kurze Übersicht der im Repo enthaltenen Funktionen. Die Funkt
 * `export_fig`: Dient zum schönen Exportieren von Matlab Figures in hoher Auflösung und als Vektorgrafik. Wird durch Matlab-interne Routinen nur unzureichend abgedeckt. Toolbox von Yair Altman [auf Github unter BSD-2-Clause Lizenz](https://github.com/altmany/export_fig).
 * `geom2d`, `geom3d`, `meshes3d`: Funktionen zum Zeichnen und Berechnen von zwei- und dreidimensionalen geometrischen Objekten. Toolbox von David Legland [auf Github unter BSD-2-Clause Lizenz](https://github.com/mattools/matGeom)
 * `rvctools`: [Robotics Toolbox von Peter Corke](http://petercorke.com/wordpress/toolboxes/robotics-toolbox). Enthält allgemeine Funktionen zur Berechnung von Robotern. Lizensiert unter GPLv3 Lizenz.
+* `legendflex`: [Matlab function for a flexible, customizable legend](https://github.com/kakearney/legendflex-pkg). Lizensiert unter MIT-Lizenz.
 * `miscellaneous`: Verschiedene Hilfsfunktionen von GitHub oder Matlab File Exchange. Die Lizenz-Datei ist jeweils mit angegeben
 
 ## Aktualisierung
