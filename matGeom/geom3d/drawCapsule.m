@@ -160,7 +160,7 @@ hold on
 if all(cap(1:3) == cap(4:6))
   % the capsule is only a sphere. take arbitrary axis to be able to plot
   cap(4:6) = cap(1:3)+eps*([0 0 1]);
-  h1 = 0;
+  h1 = plot(NaN,NaN); % empty dummy for compatibility of the interface
 else
   h1 = drawCylinder(cap, options_cyl{:});
 end
