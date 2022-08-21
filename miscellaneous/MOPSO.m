@@ -117,9 +117,15 @@ function REP = MOPSO(params,MultiObj)
         axis square;
     end
     display(['Generation #0 - Repository size: ' num2str(size(REP.pos,1))]);
-    
-    % Main MPSO loop
     stopCondition = false;
+    % call output function (for fitness of initial population)
+    if isfield(MultiObj, 'OutputFcn')
+      for i = 1:length(MultiObj.OutputFcn)
+        stopCondition = stopCondition | feval(MultiObj.OutputFcn{i},...
+          struct('POS', POS, 'POS_fit', POS_fit, 'REP', REP));
+      end
+    end
+    % Main MPSO loop
     while ~stopCondition
         
         % Select leader
