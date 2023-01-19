@@ -22,6 +22,7 @@ addpath(fullfile(this_tb_path, 'matGeom', 'polygons2d'));
 addpath(fullfile(this_tb_path, 'matGeom', 'utils'));
 addpath(fullfile(this_tb_path, 'rvctools'));
 addpath(fullfile(this_tb_path, 'legendflex'));
+addpath(fullfile(this_tb_path, 'matlab2tikz'));
 
 run(fullfile(this_tb_path, 'rvctools', 'startup_rvc.m'));
 % Ordner aus Pfad entfernen, die andere Skripte stören 
