@@ -3598,7 +3598,6 @@ function [m2t,posString] = getPositionOfText(m2t, h)
     if isempty(type) || strcmpi(type,'hggroup')
         type = get(h,'ShapeType'); % Undocumented property valid from 2008a
     end
-
     switch type
         case 'text'
             if is3D
@@ -3642,13 +3641,17 @@ function [m2t,posString] = getPositionOfText(m2t, h)
                 set(h,'Units',units,'Position',oldPos)
             end
     end
+    % manually add vertical offset (determined empirically). Otherwise text
+    % from legendflex legends is put too high
+    pos_corr = pos;
+    pos_corr(2) = pos(2)-6; % works for font size 10
+
     posString = cell(1,npos);
     for ii = 1:npos
-        posString{ii} = formatDim(pos(ii), fmtUnit);
+        posString{ii} = formatDim(pos_corr(ii), fmtUnit);
     end
-
     posString = sprintf('(%s%s)',type,join(m2t,posString,','));
-    m2t = disableClippingInCurrentAxes(m2t, pos);
+    m2t = disableClippingInCurrentAxes(m2t, pos_corr);
 
 end
 % ==============================================================================
